@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# WOIDE II
 
-## Getting Started
+## A Word OMDoc IDE 
 
-First, run the development server:
+This plugin provides the necessary functionality to create semantic annotations within Microsoft Office Word documents.
+WOIDE is a proof of concept and was developed to be a Microsoft Office Word variant of sTeX, which is currently only
+available for LATEX.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+With WOIDE annotations can be created, deleted and exported to SHTML (semantic HTML), furthermore annotation tags can be
+toggled between three different display types.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+After cloning this repository run:
+``npm install``
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+To run the development web server run:
+``npm run dev``
 
-## Learn More
+To open MS Office Word in the browser run:
+``npm run start:web``
 
-To learn more about Next.js, take a look at the following resources:
+Make sure that the `--document "<url>"` flag is set where `<url>` should be replaced by an url to a MS Office Word Web
+document.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+It is necessary for the development server to use `https` therefore the ``npm run dev`` command specifies the
+`--experimental-https` flag, seeing that the self-signed certificate that will be created by NextJS will not be trusted
+by your browser. You should make sure that the website can be reached without being blocked by the browser, otherwise
+loading the Add-In will not work. In Chromium based browsers this can be done by setting
+`chrome://flags/#allow-insecure-localhost` to enabled. Chrome removed this feature in newer versions you can enable
+this flag by setting `chrome://flags/#temporary-unexpire-flags-m129` and `chrome://flags/#temporary-unexpire-flags-m130`
+to enabled.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+This can be tested by accessing `https://localhost:<port>/manifest.xml` and `https://localhost:<port>/taskpane` without
+being blocked or asked for user interaction by the browser.
 
-## Deploy on Vercel
+After following the steps above successfully the plugin can be opened and used by clicking "Show Taskpane" in the ribbon menu.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Usage
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+WIP
