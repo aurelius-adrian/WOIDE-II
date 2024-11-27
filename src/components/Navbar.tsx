@@ -1,28 +1,40 @@
 import {Button} from "@fluentui/react-button";
 import {useDarkModeContext} from "@/components/Layout";
 import {
-    bundleIcon,
-    DarkThemeFilled,
-    CalendarMonthRegular, SettingsRegular,
+    DarkThemeFilled, HomeRegular,
+    SettingsRegular,
 } from "@fluentui/react-icons";
-import {dark} from "@mui/material/styles/createPalette";
+import {useRouter} from "next/router";
 
 
 const Navbar = () => {
     const {darkMode, setDarkMode} = useDarkModeContext();
 
+    const router = useRouter();
+    const pathname = router.asPath;
+
     return <div className="relative bg-blue-950 h-12">
         <div className="h-full flex items-center px-3 justify-between">
-            <div>
-                <Button appearance="transparent"
-                        icon={<SettingsRegular className={"transition-all text-white hover:rotate-45"}/>}
-                        onClick={() => {
-                            location.href = '/settings'
-                        }}></Button>
+            <div className={"space-x-2"}>
+                <div hidden={pathname.startsWith("/settings")}>
+                    <Button appearance="transparent"
+                            icon={<SettingsRegular className={"transition-all text-white hover:rotate-45"}/>}
+                            onClick={() => {
+                                location.href = '/settings'
+                            }}></Button>
+                </div>
+                <div hidden={pathname.startsWith("/taskpane") || pathname == "/"}>
+                    <Button appearance="transparent"
+                            icon={<HomeRegular className={"transition-all text-white"}/>}
+                            onClick={() => {
+                                location.href = '/taskpane'
+                            }}></Button>
+                </div>
             </div>
             <div>
-                <Button appearance="transparent" icon={darkMode ? <DarkThemeFilled className={"transition-all rotate-180 text-white"}/> :
-                    <DarkThemeFilled className={"transition-all rotate-360 text-white"}/>}
+                <Button appearance="transparent"
+                        icon={darkMode ? <DarkThemeFilled className={"transition-all rotate-180 text-white"}/> :
+                            <DarkThemeFilled className={"transition-all rotate-360 text-white"}/>}
                         color="white"
                         onClick={() => setDarkMode(!darkMode)}></Button>
             </div>

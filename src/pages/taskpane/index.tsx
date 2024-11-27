@@ -1,55 +1,85 @@
-import {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Accordion, AccordionHeader, AccordionItem, AccordionPanel} from "@fluentui/react-accordion";
 import {InfoRegular} from "@fluentui/react-icons";
 import {useId} from "@fluentui/react-utilities";
 import {Select} from "@fluentui/react-select";
 import {Button} from "@fluentui/react-button";
 
+
 export default function TaskPanePage() {
     const selectId = useId();
 
     const [tmp, setTmp] = useState<string>("Red");
 
-    useEffect(() => {
-        window.Office.onReady(() => {
-            console.log('TaskPainePage');
+    const test_1 = async () => {
+        await Word.run(async (context) => {
+            const text = `Einfluss von Temperaturänderungen auf die Photosyntheseleistung von Pflanzen
+
+Die Photosynthese ist ein zentraler biochemischer Prozess, der die Grundlage für das Leben auf der Erde bildet. Sie ermöglicht die Umwandlung von Lichtenergie in chemische Energie, die in Form von Glukose gespeichert wird. In der vorliegenden Arbeit wird untersucht, wie Temperaturänderungen die Effizienz der Photosynthese beeinflussen.
+
+Hintergrund
+Die Photosynthese erfolgt in zwei Hauptphasen: den lichtabhängigen Reaktionen, die in den Thylakoidmembranen der Chloroplasten ablaufen, und den lichtunabhängigen Reaktionen (Calvin-Zyklus), die im Stroma der Chloroplasten stattfinden. Beide Prozesse sind enzymatisch gesteuert, was sie anfällig für Temperaturschwankungen macht. Insbesondere Enzyme wie RubisCO, das für die Fixierung von CO₂ verantwortlich ist, zeigen eine deutliche Temperaturabhängigkeit.
+
+Methodik
+Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea mays, unter kontrollierten Bedingungen analysiert. Die Pflanzen wurden Temperaturen von 15°C, 25°C und 35°C ausgesetzt, wobei die Photosyntheserate mithilfe eines Infrarot-Gasanalyzers gemessen wurde. Zusätzlich wurden Chlorophyllfluoreszenz und die Aktivität des Enzyms RubisCO erfasst, um mögliche Mechanismen hinter den beobachteten Effekten zu identifizieren.`
+            context.document.body.insertText(text, Word.InsertLocation.start)
         });
-    });
+    }
+
+    const test_2 = async () => {
+        await Word.run(async (context) => {
+            const range: Word.Range = context.document.getSelection().getRange();
+
+            const field: Word.Field = range.insertField(Word.InsertLocation.before, Word.FieldType.date, '\\@ "M/d/yyyy h:mm am/pm"', true);
+
+            field.load("result,code");
+            await context.sync();
+
+            if (field.isNullObject) {
+                console.log("There are no fields in this document.");
+            } else {
+                console.log("Code of the field: " + field.code, "Result of the field: " + JSON.stringify(field.result));
+            }
+        });
+    }
+
+    const test_3 = async () => {
+        await Word.run(async (context) => {
+            const range: Word.Range = context.document.getSelection().getRange();
+            const ooxml = range.getOoxml();
+            await context.sync();
+            let e = document.getElementById("output");
+            if (e) e.innerHTML += ooxml.value;
+            console.log(ooxml.value);
+        });
+    }
 
     const insertText = async (text: string) => {
         // Write text to the document.
         await Word.run(async (context) => {
-            // let body = context.document.body;
-            // body.insertParagraph(text, Word.InsertLocation.end);
-            // await context.sync();
-
-            const range = context.document.getSelection();
-            await context.sync();
-            //@ts-ignore
-            range.highlight();
-
-            const critique1: Word.Critique = {
-                colorScheme: "Red",
+            const paragraph = context.document.getSelection().paragraphs.getFirst();
+            const critique1 = {
+                colorScheme: Word.CritiqueColorScheme.red,
                 start: 1,
                 length: 3
             };
-            const critique2: Word.Critique = {
-                colorScheme: "Green",
+            const critique2 = {
+                colorScheme: Word.CritiqueColorScheme.green,
                 start: 6,
                 length: 1
             };
-            const critique3: Word.Critique = {
-                colorScheme: "Blue",
+            const critique3 = {
+                colorScheme: Word.CritiqueColorScheme.blue,
                 start: 10,
                 length: 3
             };
-            const critique4: Word.Critique = {
-                colorScheme: "Lavender",
+            const critique4 = {
+                colorScheme: Word.CritiqueColorScheme.lavender,
                 start: 14,
                 length: 3
             };
-            const critique5: Word.Critique = {
-                colorScheme: "Berry",
+            const critique5 = {
+                colorScheme: Word.CritiqueColorScheme.berry,
                 start: 18,
                 length: 10
             };
@@ -57,13 +87,11 @@ export default function TaskPanePage() {
                 critiques: [critique1, critique2, critique3, critique4, critique5]
             };
 
-            // // @ts-ignore
-            // const annotationIds = paragraph.insertAnnotations(annotationSet);
+            const annotationIds = paragraph.insertAnnotations(annotationSet);
 
+            await context.sync();
 
-
-
-            // console.log("Annotations inserted:", annotationIds.value);
+            console.log("Annotations inserted:", annotationIds.value);
         });
     };
 
@@ -77,7 +105,7 @@ export default function TaskPanePage() {
                     <div>WOIDE is a tool, which brings semantic annotation to Microsoft Office Word. Use its features to
                         create active documents and more.
                     </div>
-                    <div>Lern how to use WOIDE here: <a>TODO Link</a></div>
+                    <div>Lern how to use WOIDE here: <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>See WOIDE II on GitHub</a></div>
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>
@@ -90,5 +118,21 @@ export default function TaskPanePage() {
         <Button onClick={() => insertText("loaded")}>
             Add Text
         </Button>
+        <div className={"rounded-lg border-red-700 border-2 p-2 mt-4 space-y-2"}>
+            <div className={"font-bold text-xl text-red-700"}>Testing</div>
+            <div className={"space-x-2"}>
+                <Button onClick={() => test_1()}>
+                    Test 1
+                </Button>
+                <Button onClick={() => test_2()}>
+                    Test 2
+                </Button>
+                <Button onClick={() => test_3()}>
+                    Test 3
+                </Button>
+            </div>
+            <div className={"font-bold text-xl text-red-700"}>Output</div>
+            <div id={"ouput"}/>
+        </div>
     </div>;
 }
