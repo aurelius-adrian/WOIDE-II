@@ -1,5 +1,5 @@
 import {Button} from "@fluentui/react-button";
-import {useDarkModeContext} from "@/components/Layout";
+import {useDarkModeContext} from "./Layout";
 import {
     DarkThemeFilled, HomeRegular,
     SettingsRegular,

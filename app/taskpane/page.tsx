@@ -1,3 +1,4 @@
+'use client'
 import React, {useState} from "react";
 import {Accordion, AccordionHeader, AccordionItem, AccordionPanel} from "@fluentui/react-accordion";
 import {InfoRegular} from "@fluentui/react-icons";

@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import Navbar from "./Navbar";
 import {webDarkTheme, webLightTheme} from "@fluentui/tokens";
 import {FluentProvider} from "@fluentui/react-provider";
 import React, {useContext, createContext, useEffect} from "react";
