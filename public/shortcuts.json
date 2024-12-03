@@ -1,0 +1,34 @@
+{
+  "actions": [
+    {
+      "id": "ShowTaskpane",
+      "type": "ExecuteFunction",
+      "name": "Show task pane"
+    },
+    {
+      "id": "HideTaskpane",
+      "type": "ExecuteFunction",
+      "name": "Hide task pane"
+    }
+  ],
+  "shortcuts": [
+    {
+      "action": "ShowTaskpane",
+      "key": {
+        "default": "Ctrl+Alt+Up",
+        "mac": "Command+Shift+Up",
+        "web": "Ctrl+Alt+W",
+        "windows": "Ctrl+Alt+Up"
+      }
+    },
+    {
+      "action": "HideTaskpane",
+      "key": {
+        "default": "Ctrl+Alt+Down",
+        "mac": "Command+Shift+Down",
+        "web": "Ctrl+Alt+2",
+        "windows": "Ctrl+Alt+Up"
+      }
+    }
+  ]
+}

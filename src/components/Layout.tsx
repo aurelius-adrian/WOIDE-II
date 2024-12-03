@@ -31,14 +31,36 @@ export default function Layout({children}: { children: any }) {
         }
     }, [darkMode]);
 
+    const initOfficeJS = async () => {
+        window.Office.onReady(() => {
+            console.log('WOIDE II initialized Office JS');
+        })
+
+        Office.actions.associate("ShowTaskpane", () => {
+            return Office.addin.showAsTaskpane()
+                .then(() => {
+                    return;
+                })
+                .catch((error) => {
+                    return error.code;
+                });
+        });
+
+        Office.actions.associate("HideTaskpane", () => {
+            return Office.addin.hide()
+                .then(() => {
+                    return;
+                })
+                .catch((error) => {
+                    return error.code;
+                });
+        });
+    }
+
     return (
         <div>
             <Script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
-                    onLoad={() =>
-                        window.Office.onReady(() => {
-                            console.log('TaskPainePage');
-                        })
-                    }
+                    onLoad={initOfficeJS}
                     onError={console.error}
             ></Script>
             <DarkModeContext.Provider value={{darkMode, setDarkMode}}>
