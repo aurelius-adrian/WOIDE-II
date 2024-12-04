@@ -1,17 +1,16 @@
 import {Button} from "@fluentui/react-button";
-import {useDarkModeContext} from "./Layout";
+import {useDarkModeContext} from "./Setup";
 import {
     DarkThemeFilled, HomeRegular,
     SettingsRegular,
 } from "@fluentui/react-icons";
-import {useRouter} from "next/router";
+import {useRouter, usePathname} from "next/navigation";
 
 
 const Navbar = () => {
     const {darkMode, setDarkMode} = useDarkModeContext();
 
-    const router = useRouter();
-    const pathname = router.asPath;
+    const pathname = usePathname()
 
     return <div className="relative bg-blue-950 h-12">
         <div className="h-full flex items-center px-3 justify-between">

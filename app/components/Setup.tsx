@@ -1,3 +1,4 @@
+'use client'
 import Navbar from "./Navbar";
 import {webDarkTheme, webLightTheme} from "@fluentui/tokens";
 import {FluentProvider} from "@fluentui/react-provider";
@@ -12,7 +13,7 @@ const DarkModeContext = createContext<{
     }
 });
 
-export default function Layout({children}: { children: any }) {
+export default function Setup({children}: { children: any }) {
 
     const [darkMode, setDarkMode] = React.useState(false);
     const [theme, setTheme] = React.useState(webLightTheme);
@@ -65,7 +66,9 @@ export default function Layout({children}: { children: any }) {
             ></Script>
             <DarkModeContext.Provider value={{darkMode, setDarkMode}}>
                 <FluentProvider theme={theme}>
-                    <Navbar></Navbar>
+                    <nav>
+                        <Navbar></Navbar>
+                    </nav>
                     <main className={'bg-light-bg dark:bg-dark-bg p-3'}>{children}</main>
                 </FluentProvider>
             </DarkModeContext.Provider>
