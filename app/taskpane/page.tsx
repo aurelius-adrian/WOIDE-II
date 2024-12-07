@@ -5,6 +5,8 @@ import {InfoRegular} from "@fluentui/react-icons";
 import {useId} from "@fluentui/react-utilities";
 import {Select} from "@fluentui/react-select";
 import {Button} from "@fluentui/react-button";
+import {insertAnnotation} from "../lib/annotation-api/annotations";
+import {highlightAnnotationID} from "../lib/annotation-api/navigation";
 
 
 export default function TaskPanePage() {
@@ -27,21 +29,10 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         });
     }
 
-    const test_2 = async () => {
-        await Word.run(async (context) => {
-            const range: Word.Range = context.document.getSelection().getRange();
-
-            const field: Word.Field = range.insertField(Word.InsertLocation.before, Word.FieldType.date, '\\@ "M/d/yyyy h:mm am/pm"', true);
-
-            field.load("result,code");
-            await context.sync();
-
-            if (field.isNullObject) {
-                console.log("There are no fields in this document.");
-            } else {
-                console.log("Code of the field: " + field.code, "Result of the field: " + JSON.stringify(field.result));
-            }
-        });
+    const test_2 = () => {
+        insertAnnotation().then(r => {
+            if (r != null) highlightAnnotationID(r);
+        })
     }
 
     const test_3 = async () => {

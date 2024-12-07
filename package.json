@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --experimental-https",
+    "dev": "next dev --experimental-https --experimental-https-key ./certificates/localhost-key.pem --experimental-https-cert ./certificates/localhost.pem",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "start:web": "office-addin-debugging start public/manifest.xml web --document 'https://msfau-my.sharepoint.com/:w:/r/personal/ju75hele_fauad_fau_de/_layouts/15/doc2.aspx?sourcedoc=%7BFF5C63F5-1790-4B5D-8248-6070B1BA63B4%7D&file=Document.docx&action=default&mobileredirect=true&DefaultItemOpen=1&ct=1700322908388&wdOrigin=OFFICECOM-WEB.START.EDGEWORTH&cid=aa71ae62-2c54-4b06-ac99-211a21841d1d&wdPreviousSessionSrc=HarmonyWeb&wdPreviousSession=a634c874-6e87-4b7f-aa78-d8b713c52c34'"
+    "start:web": "office-addin-debugging start public/manifest.xml web --document 'https://msfau-my.sharepoint.com/:w:/r/personal/ju75hele_fauad_fau_de/_layouts/15/doc2.aspx?sourcedoc=%7BFF5C63F5-1790-4B5D-8248-6070B1BA63B4%7D&file=Document.docx&action=default&mobileredirect=true&DefaultItemOpen=1&ct=1700322908388&wdOrigin=OFFICECOM-WEB.START.EDGEWORTH&cid=aa71ae62-2c54-4b06-ac99-211a21841d1d&wdPreviousSessionSrc=HarmonyWeb&wdPreviousSession=a634c874-6e87-4b7f-aa78-d8b713c52c34'",
+    "gen:cert": ""
   },
   "dependencies": {
     "@fluentui/react-components": "^9.51.1",
@@ -15,7 +16,8 @@
     "@mui/material": "^5.15.17",
     "next": "^15.0.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/node": "^20",

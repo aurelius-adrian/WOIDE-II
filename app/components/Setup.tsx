@@ -35,6 +35,7 @@ export default function Setup({children}: { children: any }) {
     const initOfficeJS = async () => {
         window.Office.onReady(() => {
             console.log('WOIDE II initialized Office JS');
+            window.history.replaceState = function (){}
         })
 
         Office.actions.associate("ShowTaskpane", () => {
