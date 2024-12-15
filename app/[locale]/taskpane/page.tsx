@@ -7,9 +7,11 @@ import {Select} from "@fluentui/react-select";
 import {Button} from "@fluentui/react-button";
 import {insertAnnotation} from "../lib/annotation-api/annotations";
 import {highlightAnnotationID} from "../lib/annotation-api/navigation";
+import { useTranslations } from "next-intl"
 
 
 export default function TaskPanePage() {
+    const  t = useTranslations('TaskPane')
     const selectId = useId();
 
     const [tmp, setTmp] = useState<string>("Red");
@@ -91,39 +93,35 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         <Accordion collapsible={true} className={"-ml-3 mb-3"}>
             <AccordionItem value="1">
                 <AccordionHeader expandIconPosition="end" expandIcon={<InfoRegular/>}>
-                    WOIDE - A Word OMDoc IDE
+                {t('header')}
                 </AccordionHeader>
                 <AccordionPanel>
-                    <div>WOIDE is a tool, which brings semantic annotation to Microsoft Office Word. Use its features to
-                        create active documents and more.
+                    <div>{t('description')}
                     </div>
-                    <div>Lern how to use WOIDE here: <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>See WOIDE II on GitHub</a></div>
+                    <div>{t('sub-desc1')} <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>{t('sub-desc2')}</a></div>
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>
-        <label htmlFor={selectId}>Annotation Type</label>
+        <label htmlFor={selectId}>{t('annotationType')}</label>
         <Select id={selectId} className={"mb-6"} onChange={(e) => setTmp(e.target.value)} value={tmp}>
-            <option value={"Red"}>Red</option>
-            <option value={"Green"}>Green</option>
-            <option value={"Blue"}>Blue</option>
+            <option value={"Red"}>{t('red')} </option>
+            <option value={"Green"}>{t('green')} </option>
+            <option value={"Blue"}>{t('blue')} </option>
         </Select>
         <Button onClick={() => insertText("loaded")}>
-            Add Text
+        {t('addText')} 
         </Button>
         <div className={"rounded-lg border-red-700 border-2 p-2 mt-4 space-y-2"}>
-            <div className={"font-bold text-xl text-red-700"}>Testing</div>
+            <div className={"font-bold text-xl text-red-700"}>{t('testing')}</div>
             <div className={"space-x-2"}>
                 <Button onClick={() => test_1()}>
-                    Test 1
-                </Button>
+                {t('test1')}                </Button>
                 <Button onClick={() => test_2()}>
-                    Test 2
-                </Button>
+                {t('test2')}                </Button>
                 <Button onClick={() => test_3()}>
-                    Test 3
-                </Button>
+                {t('test3')}                </Button>
             </div>
-            <div className={"font-bold text-xl text-red-700"}>Output</div>
+            <div className={"font-bold text-xl text-red-700"}>{t('output')}</div>
             <div id={"ouput"}/>
         </div>
     </div>;

@@ -7,6 +7,4 @@ services:
       - "127.0.0.1:3000:3000"
     volumes:
       - ./:/app/
-      - nodemodules:/app/node_modules
-volumes:
-  nodemodules: {}
+      
