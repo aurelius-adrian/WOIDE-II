@@ -1,6 +1,8 @@
 import {v4} from "uuid"
 import {Annotation, AnnotationProperties} from "./types";
 
+export const idSalt = "woideann_"
+
 const _randomHexColor = () => {
     const hexChars = '0123456789ABCDEF';
     let color = '#';
@@ -10,9 +12,18 @@ const _randomHexColor = () => {
     return color;
 }
 
-export const getAnnotations = async () => {
-    await Word.run(async (context) => {
-
+export const getAnnotations: () => Promise<Annotation[]> = async () => {
+    return await Word.run(async (context) => {
+        const ccs = context.document.contentControls;
+        ccs.load();
+        await context.sync();
+        const list = context.document.contentControls.items.filter(e => e.title.includes(idSalt) && e.title.includes("_s"));
+        return list.map(e => {
+            return {
+                id: e.title.slice(idSalt.length + 2),
+                properties: {}
+            }
+        })
     });
 }
 
@@ -32,28 +43,22 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         };
         let color = props.color ?? _randomHexColor();
 
-        cc_s.insertText(props.startSymbol ?? ">", Word.InsertLocation.replace);
+        cc_s.insertText(props.startSymbol ?? "❭", Word.InsertLocation.replace);
         cc_s.appearance = Word.ContentControlAppearance.hidden;
-        cc_s.title = ret.id + '_s';
+        cc_s.title = idSalt + '_s' + ret.id ;
         cc_s.font.color = color;
         cc_s.font.bold = true;
         cc_s.cannotEdit = true;
 
-        cc_e.insertText(props.endSymbol ?? "<", Word.InsertLocation.replace);
+        cc_e.insertText(props.endSymbol ?? "❬", Word.InsertLocation.replace);
         cc_e.appearance = Word.ContentControlAppearance.hidden;
-        cc_e.title = ret.id + '_e';
+        cc_e.title = idSalt + '_e' + ret.id;
         cc_e.font.color = color;
         cc_e.font.bold = true;
         cc_e.cannotEdit = true;
 
-
-
-        // context.document.properties.customProperties.add("")
-
         start.select(Word.SelectionMode.start);
         await context.sync();
-
-
     });
 
     return ret;

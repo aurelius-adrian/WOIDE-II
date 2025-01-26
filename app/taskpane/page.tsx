@@ -1,18 +1,27 @@
 'use client'
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Accordion, AccordionHeader, AccordionItem, AccordionPanel} from "@fluentui/react-accordion";
-import {InfoRegular} from "@fluentui/react-icons";
+import {EyeFilled, InfoRegular} from "@fluentui/react-icons";
 import {useId} from "@fluentui/react-utilities";
 import {Select} from "@fluentui/react-select";
-import {Button} from "@fluentui/react-button";
-import {insertAnnotation} from "../lib/annotation-api/annotations";
-import {highlightAnnotationID} from "../lib/annotation-api/navigation";
-
+import {Button, ToggleButton} from "@fluentui/react-button";
+import {getAnnotations, insertAnnotation} from "../lib/annotation-api/annotations";
+import {highlightAnnotationID, removeHighlightAnnotationID} from "../lib/annotation-api/navigation";
+import {
+    EditRegular
+} from "@fluentui/react-icons";
+import {Annotation} from "../lib/annotation-api/types";
 
 export default function TaskPanePage() {
     const selectId = useId();
 
-    const [tmp, setTmp] = useState<string>("Red");
+    const [tmp, setTmp] = useState<string>("#000099");
+    const [edit, setEdit] = useState<boolean>(false);
+    const [annotations, setAnnotations] = useState<Annotation[]>([]);
+
+    useEffect(() => {
+        if (!edit) _getAnnotations()
+    }, [edit]);
 
     const test_1 = async () => {
         await Word.run(async (context) => {
@@ -31,7 +40,8 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
 
     const test_2 = () => {
         insertAnnotation().then(r => {
-            if (r != null) highlightAnnotationID(r);
+            if (r != null) highlightAnnotationID(r).then(() => {
+            });
         })
     }
 
@@ -44,6 +54,10 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
             if (e) e.innerHTML += ooxml.value;
             console.log(ooxml.value);
         });
+    }
+
+    const test_4 = async () => {
+        _getAnnotations();
     }
 
     const insertText = async (text: string) => {
@@ -87,6 +101,10 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         });
     };
 
+    const _getAnnotations = async () => {
+        getAnnotations().then(setAnnotations);
+    }
+
     return <div>
         <Accordion collapsible={true} className={"-ml-3 mb-3"}>
             <AccordionItem value="1">
@@ -97,19 +115,36 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
                     <div>WOIDE is a tool, which brings semantic annotation to Microsoft Office Word. Use its features to
                         create active documents and more.
                     </div>
-                    <div>Lern how to use WOIDE here: <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>See WOIDE II on GitHub</a></div>
+                    <div>Lern how to use WOIDE here: <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>See WOIDE
+                        II on GitHub</a></div>
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>
-        <label htmlFor={selectId}>Annotation Type</label>
-        <Select id={selectId} className={"mb-6"} onChange={(e) => setTmp(e.target.value)} value={tmp}>
-            <option value={"Red"}>Red</option>
-            <option value={"Green"}>Green</option>
-            <option value={"Blue"}>Blue</option>
-        </Select>
-        <Button onClick={() => insertText("loaded")}>
-            Add Text
-        </Button>
+        <div className={"mb-4"}>
+            <Button icon={edit ? <EditRegular/> : <EyeFilled/>}
+                    onClick={() => setEdit(!edit)}>{edit ? "Add Annotation" : "View Annotations"}</Button>
+        </div>
+        {!edit ?
+            <div>
+                <label htmlFor={selectId}>Annotation Type</label>
+                <Select id={selectId} className={"mb-6"} onChange={(e) => setTmp(e.target.value)} value={tmp}>
+                    <option value={"#ff0000"}>Red</option>
+                    <option value={"#009933"}>Green</option>
+                    <option value={"#000056"}>Blue</option>
+                </Select>
+                <Button onClick={() => insertAnnotation({color: tmp})}>
+                    Add Annotation
+                </Button>
+            </div> :
+            <div className={"flex flex-col space-y-2"}>
+                {annotations.map((a, i) => (
+                    <ToggleButton key={i} onClick={(e) => {
+                        if ((e.target as (EventTarget & {ariaPressed: string})).ariaPressed == "false") highlightAnnotationID(a);
+                        else removeHighlightAnnotationID(a);
+                    }}>id: {a.id}</ToggleButton>
+                ))}
+            </div>
+        }
         <div className={"rounded-lg border-red-700 border-2 p-2 mt-4 space-y-2"}>
             <div className={"font-bold text-xl text-red-700"}>Testing</div>
             <div className={"space-x-2"}>
@@ -121,6 +156,9 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
                 </Button>
                 <Button onClick={() => test_3()}>
                     Test 3
+                </Button>
+                <Button onClick={() => test_4()}>
+                    Test 4
                 </Button>
             </div>
             <div className={"font-bold text-xl text-red-700"}>Output</div>
