@@ -31,7 +31,7 @@ const Navbar = ({ locale }: { locale: string }) => {
     
     return <div className="relative bg-blue-950 h-12">
         <div className="h-full flex items-center px-3 justify-between">
-            <div className={"space-x-2"}>
+
                 <div hidden={pathname.startsWith("/settings")}>
                     <Button appearance="transparent"
                             icon={<SettingsRegular className={"transition-all text-white hover:rotate-45"}/>}
@@ -46,7 +46,7 @@ const Navbar = ({ locale }: { locale: string }) => {
                                 location.href = '/taskpane'
                             }}></Button>
                 </div>
-            </div>
+ 
             <div>
                 <Button appearance="transparent"
                         icon={darkMode ? <DarkThemeFilled className={"transition-all rotate-180 text-white"}/> :
