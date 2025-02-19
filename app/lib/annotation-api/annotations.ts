@@ -18,6 +18,7 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
         ccs.load();
         await context.sync();
         const list = context.document.contentControls.items.filter(e => e.title.includes(idSalt) && e.title.includes("_s"));
+        console.log(list);
         return list.map(e => {
             return {
                 id: e.title.slice(idSalt.length + 2),
