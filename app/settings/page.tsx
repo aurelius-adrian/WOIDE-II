@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { getDocumentSetting, setDocumentSetting } from "../lib/settings-api/settings";
 
 const FORM_KEY = "annotationSettings";
+const FORM_KEY2 = "textSettings";
+const FORM_KEY3 = "numberSettings";
+const FORM_KEY4 = "moreSettings";
 
 const demoData = [
     {
@@ -32,6 +35,49 @@ const demoData = [
         ],
     },
 ];
+const demoData2 = [
+    {
+        "id": "id_6",
+        "name": "Advanced Settings",
+        "formDescription": [
+            {
+                "type": "group",
+                "label": "Network Configuration",
+                "id": "network",
+                "fields": [
+                    {
+                        "type": "textInput",
+                        "label": "IP Address",
+                        "id": "ip_address"
+                    },
+                    {
+                        "type": "number",
+                        "label": "Port",
+                        "id": "port",
+                        "value": 8080
+                    }
+                ]
+            },
+            {
+                "type": "group",
+                "label": "User Permissions",
+                "id": "permissions",
+                "fields": [
+                    {
+                        "type": "checkbox",
+                        "label": "Admin Access",
+                        "id": "admin_access"
+                    },
+                    {
+                        "type": "checkbox",
+                        "label": "Read-Only Mode",
+                        "id": "read_only"
+                    }
+                ]
+            }
+        ]
+    }
+]
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState<any>(null);
@@ -41,10 +87,12 @@ export default function SettingsPage() {
         const saveAndLoadSettings = async () => {
             try {
                 await setDocumentSetting(FORM_KEY, demoData);
+                await setDocumentSetting(FORM_KEY2, 'testing');
+                await setDocumentSetting(FORM_KEY3, 222222);
+                await setDocumentSetting(FORM_KEY4, demoData2);
                 console.log("Settings saved!");
 
                 const savedSettings = await getDocumentSetting(FORM_KEY);
-                console.log(savedSettings)
                 setSettings(savedSettings);
                 
             } catch (error) {
