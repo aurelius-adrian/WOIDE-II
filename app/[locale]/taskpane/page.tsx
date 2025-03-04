@@ -10,8 +10,10 @@ import {
 } from "@fluentui/react-icons";
 import {Annotation} from "../lib/annotation-api/types";
 import AnnotationEditor from "../components/AnnotationEditor";
+import { useTranslations } from "next-intl"
 
 export default function TaskPanePage() {
+    const  t = useTranslations('TaskPane')
 
     const [edit, setEdit] = useState<boolean>(true);
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
@@ -28,14 +30,12 @@ export default function TaskPanePage() {
         <Accordion collapsible={true} className={"-ml-3 mb-3"}>
             <AccordionItem value="1">
                 <AccordionHeader expandIconPosition="end" expandIcon={<InfoRegular/>}>
-                    WOIDE - A Word OMDoc IDE
+                {t('header')}
                 </AccordionHeader>
                 <AccordionPanel>
-                    <div>WOIDE is a tool, which brings semantic annotation to Microsoft Office Word. Use its features to
-                        create active documents and more.
+                    <div>{t('description')}
                     </div>
-                    <div>Lern how to use WOIDE here: <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>See WOIDE
-                        II on GitHub</a></div>
+                    <div>{t('sub-desc1')} <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>{t('sub-desc2')}</a></div>
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>

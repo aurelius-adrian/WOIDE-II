@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "start:web": "office-addin-debugging start public/manifest.xml web --document 'https://msfau-my.sharepoint.com/:w:/r/personal/ju75hele_fauad_fau_de/_layouts/15/doc2.aspx?sourcedoc=%7BFF5C63F5-1790-4B5D-8248-6070B1BA63B4%7D&file=Document.docx&action=default&mobileredirect=true&DefaultItemOpen=1&ct=1700322908388&wdOrigin=OFFICECOM-WEB.START.EDGEWORTH&cid=aa71ae62-2c54-4b06-ac99-211a21841d1d&wdPreviousSessionSrc=HarmonyWeb&wdPreviousSession=a634c874-6e87-4b7f-aa78-d8b713c52c34'",
+    "start:web": "office-addin-debugging start public/manifest.xml web --document 'https://msfau-my.sharepoint.com/:w:/g/personal/av80itoj_fauad_fau_de/EWM2FvKML5tBkUhtSyCBUYsBTyYrYLH5GueT8moq-7euAA?e=ZsEx3G'",
     "gen:cert": ""
   },
   "dependencies": {
     "@fluentui/react-components": "^9.51.1",
     "@microsoft/office-js": "^1.1.94",
     "@mui/material": "^5.15.17",
+    "i18n": "^0.15.1",
     "next": "^15.0.3",
+    "next-intl": "^3.26.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
