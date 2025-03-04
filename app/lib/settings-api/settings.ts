@@ -42,3 +42,34 @@ export async function getDocumentSetting<T>(key: string): Promise<T | null> {
         throw new Error(`Failed to retrieve setting: ${(error as Error).message}`);
     }
 }
+
+/**
+ * Retrieves all stored settings from the Word document.
+ * @returns An object containing all settings as key-value pairs.
+ */
+export async function getAllDocumentSettings(): Promise<Record<string, any>> {
+    if (typeof window === "undefined" || !window.Office || !window.Word) {
+        throw new Error("Word API is not available. Run this inside Microsoft Word.");
+    }
+
+    try {
+        return await Word.run(async (context) => {
+            const settings = context.document.settings;
+            settings.load("items");
+            await context.sync();
+
+            const allSettings: Record<string, any> = {};
+            settings.items.forEach(setting => {
+                try {
+                    allSettings[setting.key] = JSON.parse(setting.value); // Deserialize JSON if possible
+                } catch {
+                    allSettings[setting.key] = setting.value; // Use raw value if parsing fails
+                }
+            });
+
+            return allSettings;
+        });
+    } catch (error) {
+        throw new Error(`Failed to retrieve all settings: ${(error as Error).message}`);
+    }
+}

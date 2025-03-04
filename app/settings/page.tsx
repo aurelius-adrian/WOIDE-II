@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getDocumentSetting, setDocumentSetting } from "../lib/settings-api/settings";
+import { getAllDocumentSettings, setDocumentSetting } from "../lib/settings-api/settings";
 
 const FORM_KEY = "annotationSettings";
 const FORM_KEY2 = "textSettings";
@@ -35,66 +35,67 @@ const demoData = [
         ],
     },
 ];
+
 const demoData2 = [
     {
-        "id": "id_6",
-        "name": "Advanced Settings",
-        "formDescription": [
+        id: "id_6",
+        name: "Advanced Settings",
+        formDescription: [
             {
-                "type": "group",
-                "label": "Network Configuration",
-                "id": "network",
-                "fields": [
+                type: "group",
+                label: "Network Configuration",
+                id: "network",
+                fields: [
                     {
-                        "type": "textInput",
-                        "label": "IP Address",
-                        "id": "ip_address"
+                        type: "textInput",
+                        label: "IP Address",
+                        id: "ip_address",
                     },
                     {
-                        "type": "number",
-                        "label": "Port",
-                        "id": "port",
-                        "value": 8080
-                    }
-                ]
+                        type: "number",
+                        label: "Port",
+                        id: "port",
+                        value: 8080,
+                    },
+                ],
             },
             {
-                "type": "group",
-                "label": "User Permissions",
-                "id": "permissions",
-                "fields": [
+                type: "group",
+                label: "User Permissions",
+                id: "permissions",
+                fields: [
                     {
-                        "type": "checkbox",
-                        "label": "Admin Access",
-                        "id": "admin_access"
+                        type: "checkbox",
+                        label: "Admin Access",
+                        id: "admin_access",
                     },
                     {
-                        "type": "checkbox",
-                        "label": "Read-Only Mode",
-                        "id": "read_only"
-                    }
-                ]
-            }
-        ]
-    }
-]
+                        type: "checkbox",
+                        label: "Read-Only Mode",
+                        id: "read_only",
+                    },
+                ],
+            },
+        ],
+    },
+];
 
 export default function SettingsPage() {
-    const [settings, setSettings] = useState<any>(null);
+    const [settings, setSettings] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const saveAndLoadSettings = async () => {
             try {
                 await setDocumentSetting(FORM_KEY, demoData);
-                await setDocumentSetting(FORM_KEY2, 'testing');
+                await setDocumentSetting(FORM_KEY2, "testing");
                 await setDocumentSetting(FORM_KEY3, 222222);
                 await setDocumentSetting(FORM_KEY4, demoData2);
                 console.log("Settings saved!");
 
-                const savedSettings = await getDocumentSetting(FORM_KEY);
-                setSettings(savedSettings);
-                
+                // Fetch all settings instead of just one
+                const allSettings = await getAllDocumentSettings();
+                setSettings(allSettings);
             } catch (error) {
                 console.error("Error handling settings:", error);
             } finally {
@@ -103,12 +104,9 @@ export default function SettingsPage() {
         };
 
         // Ensure Word is initialized before running API calls
-        setTimeout(()=> {
+        setTimeout(() => {
             saveAndLoadSettings();
-         }
-         ,200);
-            
-        
+        }, 200);
     }, []);
 
     return (
