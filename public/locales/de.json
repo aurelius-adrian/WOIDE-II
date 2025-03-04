@@ -1,0 +1,22 @@
+{
+  "SettingsPage": {
+    "title": "Einstellungen"
+  },
+  "Navbar": {},
+  "TaskPane": {
+    "header": "WOIDE - Eine Word OMDoc IDE",
+    "description": "WOIDE ist ein Tool, das semantische Annotationen in Microsoft Office Word ermöglicht. Nutzen Sie seine Funktionen, um aktive Dokumente und mehr zu erstellen.",
+    "sub-desc1": "Erfahren Sie hier, wie Sie WOIDE verwenden:",
+    "sub-desc2": "Sehen Sie sich WOIDE II auf GitHub an",
+    "annotationType": "Annotationstyp",
+    "red": "Rot",
+    "blue": "Blau",
+    "green": "Grün",
+    "addText": "Text hinzufügen",
+    "testing": "Testen",
+    "test1": "Test 1",
+    "test2": "Test 2",
+    "test3": "Test 3",
+    "output": "Ausgabe"
+  }
+}
