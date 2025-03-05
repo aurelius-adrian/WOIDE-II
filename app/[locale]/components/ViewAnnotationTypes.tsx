@@ -1,51 +1,31 @@
 import {AnnotationType} from "../../lib/utils/annotations";
 import {Accordion, AccordionHeader, AccordionItem, AccordionPanel} from "@fluentui/react-accordion";
-import React, {Dispatch, SetStateAction} from "react";
+import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Button} from "@fluentui/react-button";
 import {EditRegular} from "@fluentui/react-icons";
+import {getDocumentSetting} from "../../lib/settings-api/settings";
 
 
 export const ViewAnnotationTypes = ({setAnnotationType}: {
     setAnnotationType: Dispatch<SetStateAction<AnnotationType | null>>
 }) => {
-    const demoData: AnnotationType[] = [
-        {
-            "id": "id 0",
-            "name": "Test",
-            "formDescription": [
-                {
-                    "type": "textInput",
-                    "label": "Text 1 Label",
-                    "id": "id0"
-                },
-                {
-                    "type": "textInput",
-                    "label": "Text 2 Label",
-                    "id": "id1"
-                },
-                {
-                    "type": "select",
-                    "label": "Select Label",
-                    "id": "id2",
-                    "options": [
-                        {
-                            "value": "value0",
-                            "label": "Option 1"
-                        },
-                        {
-                            "value": "value1",
-                            "label": "Option 2"
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
+    const [data, setData] = useState<AnnotationType[]>([]);
+
+    useEffect(() => {
+        const _getData = async () => {
+            setData(((await getDocumentSetting('annotationTypes')) ?? []) as AnnotationType[])
+        };
+
+        _getData();
+    }, [setData]);
 
     return (<div>
-        Annotation Types:
+        <div className={"mb-2"}>Annotation Types:</div>
+        <Button onClick={() => setAnnotationType({formDescription: [], name: "New Annotation Type"})}>
+            Add Annotation Type
+        </Button>
         <Accordion collapsible>
-            {demoData.map((e: AnnotationType, idx: number) =>
+            {data.map((e: AnnotationType, idx: number) =>
                 <AccordionItem key={idx} value={idx}>
                     <AccordionHeader>{e.name}</AccordionHeader>
                     <AccordionPanel>

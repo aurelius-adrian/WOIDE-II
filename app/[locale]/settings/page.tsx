@@ -6,7 +6,6 @@ import {AnnotationType} from "../../lib/utils/annotations";
 import {EditAnnotationType} from "../components/EditAnnotationType";
 import {Button} from "@fluentui/react-button";
 import {ArrowReplyRegular} from "@fluentui/react-icons";
-// import { getAllDocumentSettings, setDocumentSetting } from "../lib/settings-api/settings";
 
 export default function SettingsPage() {
     const [annotationType, setAnnotationType] = useState<AnnotationType | null>(null);
