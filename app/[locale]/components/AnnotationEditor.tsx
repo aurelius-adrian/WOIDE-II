@@ -1,10 +1,10 @@
 import {Select} from "@fluentui/react-select";
 import {Button} from "@fluentui/react-button";
-import {insertAnnotation} from "../lib/annotation-api/annotations";
+import {insertAnnotation} from "../../lib/annotation-api/annotations";
 import React, {useRef, useState} from "react";
 import Form, {AnnotationFormApi} from "./Form";
 import {useId} from "@fluentui/react-utilities";
-import {highlightAnnotationID} from "../lib/annotation-api/navigation";
+import {highlightAnnotationID} from "../../lib/annotation-api/navigation";
 
 
 export const AnnotationEditor = () => {

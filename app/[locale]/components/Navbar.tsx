@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {Button} from "@fluentui/react-button";
 import {Select} from "@fluentui/react-select";
 import {useId} from "@fluentui/react-utilities";
@@ -18,8 +18,8 @@ const Navbar = () => {
     const pathname = usePathname()
     const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newLocale = e.target.value;
-        const path = pathname.split("/").slice(2).join("/"); 
-        window.location.href = (`/${newLocale}/${path}`); 
+        const path = pathname.split("/").slice(2).join("/");
+        window.location.href = (`/${newLocale}/${path}`);
     };
     
     return <div className="relative bg-blue-950 h-12">

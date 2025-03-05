@@ -1,10 +1,28 @@
 'use client'
-import { useTranslations } from "next-intl";
+
+import {useState} from "react";
+import {ViewAnnotationTypes} from "../components/ViewAnnotationTypes";
+import {AnnotationType} from "../../lib/utils/annotations";
+import {EditAnnotationType} from "../components/EditAnnotationType";
+import {Button} from "@fluentui/react-button";
+import {ArrowReplyRegular} from "@fluentui/react-icons";
+// import { getAllDocumentSettings, setDocumentSetting } from "../lib/settings-api/settings";
 
 export default function SettingsPage() {
-    const  t = useTranslations('SettingsPage')
-    return <div>{t('title')}
+    const [annotationType, setAnnotationType] = useState<AnnotationType | null>(null);
 
-        
-    </div>;
+    return <>
+        <div className={"text-xl font-bold"}>Settings</div>
+        {annotationType ?
+            <>
+                <div className={"-mb-3 -ml-3"}>
+                    <Button appearance={"transparent"} icon={<ArrowReplyRegular/>} onClick={() => setAnnotationType(null)}>
+                        View Annotations
+                    </Button>
+                </div>
+                <EditAnnotationType annotationType={annotationType}/>
+            </> :
+            <ViewAnnotationTypes setAnnotationType={setAnnotationType}/>
+        }
+    </>;
 }

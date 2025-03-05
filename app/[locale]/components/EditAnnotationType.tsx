@@ -1,7 +1,7 @@
 import Form, {AnnotationFormApi} from "./Form";
 import {Button} from "@fluentui/react-button";
 import {useRef} from "react";
-import {AnnotationType} from "../lib/utils/annotations";
+import {AnnotationType} from "../../lib/utils/annotations";
 
 
 export const EditAnnotationType = ({annotationType}: {annotationType: AnnotationType}) => {

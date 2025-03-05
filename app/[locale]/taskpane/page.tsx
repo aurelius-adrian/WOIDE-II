@@ -3,12 +3,12 @@ import React, {useEffect, useState} from "react";
 import {Accordion, AccordionHeader, AccordionItem, AccordionPanel} from "@fluentui/react-accordion";
 import {EyeFilled, InfoRegular} from "@fluentui/react-icons";
 import {Button, ToggleButton} from "@fluentui/react-button";
-import {getAnnotations} from "../lib/annotation-api/annotations";
-import {highlightAnnotationID, removeHighlightAnnotationID} from "../lib/annotation-api/navigation";
+import {getAnnotations} from "../../lib/annotation-api/annotations";
+import {highlightAnnotationID, removeHighlightAnnotationID} from "../../lib/annotation-api/navigation";
 import {
     EditRegular
 } from "@fluentui/react-icons";
-import {Annotation} from "../lib/annotation-api/types";
+import {Annotation} from "../../lib/annotation-api/types";
 import AnnotationEditor from "../components/AnnotationEditor";
 import { useTranslations } from "next-intl"
 
