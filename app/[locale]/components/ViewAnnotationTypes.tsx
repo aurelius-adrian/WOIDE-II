@@ -4,20 +4,23 @@ import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {Button} from "@fluentui/react-button";
 import {EditRegular} from "@fluentui/react-icons";
 import {getDocumentSetting} from "../../lib/settings-api/settings";
+import {Annotation} from "../../lib/annotation-api/types";
+import {useOfficeReady} from "./Setup";
 
 
 export const ViewAnnotationTypes = ({setAnnotationType}: {
     setAnnotationType: Dispatch<SetStateAction<AnnotationType | null>>
 }) => {
-    const [data, setData] = useState<AnnotationType[]>([]);
+    const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
+    const officeReady = useOfficeReady();
 
     useEffect(() => {
         const _getData = async () => {
-            setData(((await getDocumentSetting('annotationTypes')) ?? []) as AnnotationType[])
+            setAnnotationTypes(((await getDocumentSetting('annotationTypes')) ?? []) as AnnotationType[])
         };
 
-        _getData();
-    }, [setData]);
+        if (officeReady) _getData();
+    }, [officeReady, setAnnotationTypes]);
 
     return (<div>
         <div className={"mb-2"}>Annotation Types:</div>
@@ -25,7 +28,7 @@ export const ViewAnnotationTypes = ({setAnnotationType}: {
             Add Annotation Type
         </Button>
         <Accordion collapsible>
-            {data.map((e: AnnotationType, idx: number) =>
+            {annotationTypes.map((e: AnnotationType, idx: number) =>
                 <AccordionItem key={idx} value={idx}>
                     <AccordionHeader>{e.name}</AccordionHeader>
                     <AccordionPanel>

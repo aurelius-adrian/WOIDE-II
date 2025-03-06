@@ -1,17 +1,32 @@
+'use client'
 import {Select} from "@fluentui/react-select";
 import {Button} from "@fluentui/react-button";
 import {insertAnnotation} from "../../lib/annotation-api/annotations";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Form, {AnnotationFormApi} from "./Form";
 import {useId} from "@fluentui/react-utilities";
 import {highlightAnnotationID} from "../../lib/annotation-api/navigation";
+import {AnnotationType} from "../../lib/utils/annotations";
+import {getDocumentSetting} from "../../lib/settings-api/settings";
+import {useOfficeReady} from "./Setup";
 
 
 export const AnnotationEditor = () => {
     const selectId = useId();
+    const officeReady = useOfficeReady();
 
-    const [tmp, setTmp] = useState<string>("#000099");
+    const [selectedAnnotationTypeId, setSelectedAnnotationTypeId] = useState<string>("");
     const formRef = useRef<AnnotationFormApi>(null);
+
+    const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
+
+    useEffect(() => {
+        const _getData = async () => {
+            setAnnotationTypes(((await getDocumentSetting('annotationTypes')) ?? []) as AnnotationType[])
+        };
+
+        if (officeReady) _getData();
+    }, [officeReady, setAnnotationTypes]);
 
     const test_1 = async () => {
         await Word.run(async (context) => {
@@ -94,24 +109,18 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     const addAnnotation = async () => {
         const data = await formRef.current?.submit();
         console.log(data);
-        insertAnnotation({color: tmp});
+        insertAnnotation({color: selectedAnnotationTypeId});
     }
 
     return <div>
         <label htmlFor={selectId}>Annotation Type</label>
-        <Select id={selectId} className={"mb-6"} onChange={(e) => setTmp(e.target.value)} value={tmp}>
-            <option value={"#ff0000"}>Red</option>
-            <option value={"#009933"}>Green</option>
-            <option value={"#000056"}>Blue</option>
+        <Select id={selectId} className={"mb-6"} onChange={(e) => setSelectedAnnotationTypeId(e.target.value)}
+                value={selectedAnnotationTypeId}>
+            {annotationTypes.map((e, idx) => (<option key={idx} value={e.id}>{e.name}</option>))}
         </Select>
         <div className={"mb-4"}>
-            <Form formDescription={[
-                {id: "hello1", type: "textInput", label: "Hello 1"},
-                {id: "hello2", type: "textInput", label: "Hello 2"},
-                {id: "hello3", type: "textInput", label: "Hello 3"},
-                {id: "hello4", type: "textInput", label: "Hello 4"},
-                {id: "hello5", type: "textInput", label: "Hello 5"},
-            ]} ref={formRef}/>
+            <Form formDescription={(annotationTypes.find(e => e.id == selectedAnnotationTypeId)?.formDescription) ?? []}
+                  ref={formRef}/>
         </div>
         <Button onClick={addAnnotation}>
             Add Annotation
