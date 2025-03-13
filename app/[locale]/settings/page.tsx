@@ -20,7 +20,7 @@ export default function SettingsPage() {
                         View Annotations
                     </Button>
                 </div>
-                <EditAnnotationType annotationType={annotationType}/>
+                <EditAnnotationType annotationType={annotationType} setAnnotationType={setAnnotationType}/>
             </> :
             <ViewAnnotationTypes setAnnotationType={setAnnotationType}/>
         }
