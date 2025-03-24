@@ -1,80 +1,82 @@
-import React, { useState, useEffect } from "react";
-import { Form } from "./Form";
+import Form, { AnnotationFormApi } from "./Form";
 import { Button } from "@fluentui/react-button";
-import { AnnotationType, FormElementTypes, FormDescription, FormData } from "./Form"; // Make sure the path is correct
+import { useRef, useState } from "react";
+import { AnnotationType } from "../../lib/utils/annotations";
+import {
+  setDocumentSetting,
+  getAllDocumentSettings,
+} from "../../lib/settings-api/settings";
+import ErrorMessage from "./ErrorMessage";
 
-export const EditAnnotationType = ({
-  annotationType,
-  onSave,
-}: {
-  annotationType: AnnotationType;
-  onSave: (updatedAnnotation: AnnotationType) => void;
-}) => {
-  const [formDescription, setFormDescription] = useState<FormDescription>(annotationType.formDescription || []);
-  const [annotationName, setAnnotationName] = useState(annotationType.name || "");
+interface AddAnnotationFormProps {
+  onClose: () => void;
+}
 
-  // Update form description if the passed annotationType changes
-  useEffect(() => {
-    setAnnotationDescription(annotationType.formDescription);
-    setAnnotationName(annotationType.name);
-  }, [annotationType]);
+export const AddAnnotationForm = ({ onClose }: AddAnnotationFormProps) => {
+  const [annotationType, setAnnotationType] = useState<AnnotationType | null>(
+    null
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const formApi = useRef<AnnotationFormApi>(null);
 
-  // Function to dynamically add a new field to the formDescription array
-  const addField = (type: FormElementTypes) => {
-    const newField: FormElementDescription = {
-      id: `id${formDescription.length}`,
-      label: `${type} Label`,
-      type: type,
-    };
-
-    if (type === "select" || type === "selectOptions") {
-      newField.options = [{ value: "value1", label: "Option 1" }];
+  const handleSave = async () => {
+    try {
+      const formData = await formApi.current?.submit();
+      const existingSettings = await getAllDocumentSettings();
+      if (formData && formData.name) {
+        const trimmedName = String(formData.name).replace(/\s+/g, "");
+        if (existingSettings[trimmedName]) {
+          setErrorMessage(
+            "* An annotation type with this name already exists."
+          );
+          return;
+        }
+        const annotationTypeData = {
+          ...formData,
+          id: trimmedName,
+        };
+        await setDocumentSetting(trimmedName, annotationTypeData);
+        console.log("Annotation Type saved successfully:", annotationTypeData);
+        setAnnotationType(null);
+        onClose();
+      } else {
+        setErrorMessage(
+          "* Invalid form data. Please fill out all required fields."
+        );
+      }
+    } catch (error) {
+      console.error("Failed to save annotation type:", error);
+      setErrorMessage("* An error occurred while saving the annotation type.");
     }
-
-    setFormDescription([...formDescription, newField]);
-  };
-
-  const handleSave = async (formData: FormData | null) => {
-    if (!formData) return;
-
-    const updatedAnnotation: AnnotationType = {
-      ...annotationType,  // Retain other properties of the annotation
-      name: annotationName,  // Update the name
-      formDescription: formDescription,  // Update the formDescription
-    };
-
-    onSave(updatedAnnotation);  // Pass the updated annotation to the parent
   };
 
   return (
-    <div>
-      <h2>Edit Annotation Type</h2>
+    <>
+      {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+      <div
+        className={"flex flex-col gap-2 items-start border p-4 rounded shadow"}
+      >
+        <div className={"w-full"}>
+          <Form
+            ref={formApi}
+            formMode="add"
+            formDescription={[
+              {
+                id: "name",
+                type: "textInput",
+                label: "Annotation Type Name",
+              },
+              {
+                id: "formDescription",
+                type: "formElementSelector",
+                label: "Form Description",
+              },
+            ]}
+          />
+        </div>
 
-      {/* Annotation Name Input */}
-      <input
-        type="text"
-        value={annotationName}
-        onChange={(e) => setAnnotationName(e.target.value)}
-        placeholder="Annotation Name"
-      />
-
-      {/* Form for Dynamic Fields */}
-      <Form
-        formDescription={formDescription}
-        onChange={(e) => console.log(e)} // Optional, to track changes
-        formData={{}}  // Pass initial empty data
-        ref={null}  // We don't need a ref here for submitting the form
-      />
-
-      {/* Buttons to Add Different Types of Fields */}
-      <Button onClick={() => addField("textInput")}>Add Text Input</Button>
-      <Button onClick={() => addField("select")}>Add Select Field</Button>
-      <Button onClick={() => addField("formElementSelector")}>Add Form Element Selector</Button>
-
-      {/* Save Button */}
-      <Button onClick={async () => await handleSave({})}>
-        Save Updated Annotation Type
-      </Button>
-    </div>
+        <Button onClick={handleSave}>Save Annotation Type</Button>
+      </div>
+    </>
   );
 };
