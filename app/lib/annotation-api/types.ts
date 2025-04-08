@@ -1,10 +1,10 @@
 export type Annotation = {
     id: string;
-    properties: AnnotationProperties;
-}
+} & AnnotationProperties;
 
 export type AnnotationProperties = {
     color?: string | undefined,
     startSymbol?: string | undefined,
     endSymbol?: string | undefined,
+    data?: string | undefined,
 }

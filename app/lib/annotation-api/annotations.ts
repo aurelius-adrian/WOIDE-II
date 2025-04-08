@@ -12,18 +12,37 @@ const _randomHexColor = () => {
     return color;
 }
 
+export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () => {
+    return await Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        const ccs = selection.contentControls;
+        ccs.load();
+        await context.sync();
+        const list = selection.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
+        console.log(list);
+        return list.map(e => {
+            return {
+                id: e.tag.slice(idSalt.length + 2),
+                data: e.title,
+                color: e.color,
+            } as Annotation;
+        })
+    });
+}
+
 export const getAnnotations: () => Promise<Annotation[]> = async () => {
     return await Word.run(async (context) => {
         const ccs = context.document.contentControls;
         ccs.load();
         await context.sync();
-        const list = context.document.contentControls.items.filter(e => e.title.includes(idSalt) && e.title.includes("_s"));
+        const list = context.document.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
         console.log(list);
         return list.map(e => {
             return {
-                id: e.title.slice(idSalt.length + 2),
-                properties: {}
-            }
+                id: e.tag.slice(idSalt.length + 2),
+                data: e.title,
+                color: e.color,
+            } as Annotation;
         })
     });
 }
@@ -46,14 +65,15 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
 
         cc_s.insertText(props.startSymbol ?? "❭", Word.InsertLocation.replace);
         cc_s.appearance = Word.ContentControlAppearance.hidden;
-        cc_s.title = idSalt + '_s' + ret.id ;
+        cc_s.tag = idSalt + '_s' + ret.id;
+        cc_s.title = props.data ?? "";
         cc_s.font.color = color;
         cc_s.font.bold = true;
         cc_s.cannotEdit = true;
 
         cc_e.insertText(props.endSymbol ?? "❬", Word.InsertLocation.replace);
         cc_e.appearance = Word.ContentControlAppearance.hidden;
-        cc_e.title = idSalt + '_e' + ret.id;
+        cc_e.tag = idSalt + '_e' + ret.id;
         cc_e.font.color = color;
         cc_e.font.bold = true;
         cc_e.cannotEdit = true;

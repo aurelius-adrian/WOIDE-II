@@ -18,5 +18,12 @@
     "test2": "Test 2",
     "test3": "Test 3",
     "output": "Output"
+  },
+  "form": {
+    "selectAnnotation": {
+      "_name": "Annotation Selector",
+      "notice": "Select the start tag of a annotation and click on the 'Select' button or enter the ID of the annotation below.",
+      "select": "Select"
+    }
   }
 }

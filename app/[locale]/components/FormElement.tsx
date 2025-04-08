@@ -3,6 +3,7 @@ import TextInput from "./formElements/TextInput";
 import Select from "./formElements/Select";
 import FormElementSelector from "./formElements/FormElementSelector";
 import SelectOptions from "./formElements/SelectOptions";
+import SelectAnnotation from "./formElements/SelectAnnotation";
 
 interface FormElementProps {
     description: FormElementDescription
@@ -20,6 +21,8 @@ export const FormElement = ({description}: FormElementProps) => {
                 return <SelectOptions description={description}/>
             case "formElementSelector":
                 return <FormElementSelector description={description}/>
+            case "selectAnnotation":
+                return <SelectAnnotation description={description}/>
             default:
                 return <div>Error Loading Element</div>
         }

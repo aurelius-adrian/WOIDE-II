@@ -1,10 +1,12 @@
 import {_getAnnotationRange, idSalt} from "./annotations";
 import {Annotation} from "./types";
 
-export const highlightAnnotationID = async (a: Annotation) => {
+export const highlightAnnotationID = async (a: Annotation | string) => {
+    const id = typeof a === "string" ? a : a.id;
+
     await Word.run(async (context) => {
-        const start = context.document.contentControls.getByTitle(idSalt + '_s' + a.id);
-        const end = context.document.contentControls.getByTitle(idSalt + '_e' + a.id);
+        const start = context.document.contentControls.getByTag(idSalt + '_s' + id);
+        const end = context.document.contentControls.getByTag(idSalt + '_e' + id);
         start.load('text');
         end.load('text');
         await context.sync();
@@ -17,10 +19,12 @@ export const highlightAnnotationID = async (a: Annotation) => {
     });
 }
 
-export const removeHighlightAnnotationID = async (a: Annotation) => {
+export const removeHighlightAnnotationID = async (a: Annotation | string) => {
+    const id = typeof a === "string" ? a : a.id;
+
     await Word.run(async (context) => {
-        const start = context.document.contentControls.getByTitle(idSalt + '_s' + a.id);
-        const end = context.document.contentControls.getByTitle(idSalt + '_e' + a.id);
+        const start = context.document.contentControls.getByTag(idSalt + '_s' + id);
+        const end = context.document.contentControls.getByTag(idSalt + '_e' + id);
         start.load('text');
         end.load('text');
         await context.sync();
@@ -31,4 +35,11 @@ export const removeHighlightAnnotationID = async (a: Annotation) => {
         let aRange = _getAnnotationRange(start.items[0].getRange(), end.items[0].getRange());
         aRange.removeHighlight();
     });
+}
+
+export const timedHighlightAnnotationID = (a: Annotation | string, timeout: number) => {
+    highlightAnnotationID(a);
+    setTimeout(() => {
+        removeHighlightAnnotationID(a);
+    }, timeout);
 }

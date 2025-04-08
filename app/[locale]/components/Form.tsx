@@ -4,7 +4,10 @@ import FormElement from "./FormElement";
 import {FormElementSelectorData} from "./formElements/FormElementSelector";
 import {SelectOptionsData} from "./formElements/SelectOptions";
 
-export type FormElementTypes = "textInput" | "formElementSelector" | "select" | "selectOptions";
+export const ExternalFormElementTypesList = ["textInput", "select", "selectAnnotation"] as const;
+export const InternalFormElementTypesList = ["formElementSelector", "selectOptions"] as const;
+export const FormElementTypesList = [...ExternalFormElementTypesList, ...InternalFormElementTypesList] as const;
+export type FormElementTypes = (typeof FormElementTypesList)[number];
 export type FormFieldData = string | FormElementSelectorData | SelectOptionsData[];
 
 export type FormElementDescription = {
@@ -12,6 +15,7 @@ export type FormElementDescription = {
     label: string;
     type: FormElementTypes;
     options?: { value: string, label: string }[]; // select
+    allowedAnnotationTypes?: string[]; // selectAnnotation
 }
 
 export type FormDescription = FormElementDescription[];
@@ -49,7 +53,7 @@ export const Form = forwardRef<AnnotationFormApi, {
 
     return <>
         <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} onChange={onChange} >
+            <form onSubmit={handleSubmit(onSubmit)} onChange={onChange}>
                 <div className={"flex flex-col"}>
                     {formDescription.map((e, i) => <FormElement key={i} description={e}/>)}
                 </div>

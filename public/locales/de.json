@@ -18,5 +18,12 @@
     "test2": "Test 2",
     "test3": "Test 3",
     "output": "Ausgabe"
+  },
+  "form": {
+    "selectAnnotation": {
+      "_name": "Annotations Wähler",
+      "notice": "Markieren Sie den Start-Tag einer Annotation und klicken Sie den 'Auswählen' Knopf oder geben Sie unten die ID der Annotation ein.",
+      "select": "Auswählen"
+    }
   }
 }

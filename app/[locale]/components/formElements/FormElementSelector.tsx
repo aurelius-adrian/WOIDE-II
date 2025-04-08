@@ -1,7 +1,7 @@
 import {useFieldArray, useFormContext} from "react-hook-form";
 import {Accordion, AccordionHeader, AccordionItem, AccordionPanel, Label} from "@fluentui/react-components";
 import {useId} from "react";
-import {FormDescription, FormElementDescription, FormElementTypes} from "../Form";
+import {ExternalFormElementTypesList, FormDescription, FormElementDescription, FormElementTypes} from "../Form";
 import {Button} from "@fluentui/react-button";
 import {AddFilled, DeleteRegular} from "@fluentui/react-icons";
 import FormElement from "../FormElement";
@@ -48,36 +48,26 @@ const FormElementSelect = ({description}: FormElementSelectorProps) => {
 
     const getDescription = (path: string, type: string): FormDescription => {
         const defaultElements: FormDescription = [
-                {
-                    id: `${path}.type`,
-                    label: "Type",
-                    type: "select",
-                    options: [
-                        {
-                            label: "Text Input",
-                            value: "textInput",
-                        },
-                        {
-                            label: "Select",
-                            value: "select",
-                        },
-                        {
-                            label: "Test",
-                            value: "test",
-                        }
-                    ]
-                },
-                {
-                    id: `${path}.id`,
-                    label: "ID",
-                    type: "textInput",
-                },
-                {
-                    id: `${path}.label`,
-                    label: "Label",
-                    type: "textInput",
-                },
-            ];
+            {
+                id: `${path}.type`,
+                label: "Type",
+                type: "select",
+                options: ExternalFormElementTypesList.map(e => ({
+                    label: e, // TODO use translation
+                    value: e,
+                }))
+            },
+            {
+                id: `${path}.id`,
+                label: "ID",
+                type: "textInput",
+            },
+            {
+                id: `${path}.label`,
+                label: "Label",
+                type: "textInput",
+            },
+        ];
 
         const elementsDescription: mapType = {
             "textInput": defaultElements,
@@ -89,12 +79,21 @@ const FormElementSelect = ({description}: FormElementSelectorProps) => {
                     type: "selectOptions",
                 },
             ],
-            "test": [
+            "selectAnnotation": [
                 ...defaultElements,
                 {
-                    id: `${path}.someElement`,
-                    label: "Some Element",
-                    type: "textInput",
+                    id: `${path}.allowedAnnotationTypes`,
+                    label: "Erlaubter Annotations Typ",
+                    type: "select",
+                    options: [
+                        {
+                            label: "Alle",
+                            value: "",
+                        },
+                        ...ExternalFormElementTypesList.map(e => ({
+                            label: e, // TODO use translation
+                            value: e,
+                        }))]
                 },
             ],
         };
@@ -113,7 +112,8 @@ const FormElementSelect = ({description}: FormElementSelectorProps) => {
             </AccordionHeader>
             <AccordionPanel>
                 <div className={"w-full flex flex-row -mb-2 gap-2"}>
-                    <Button size={"small"} appearance={"outline"} onClick={() => insertFormElementField(idx, defaultEntryData)}
+                    <Button size={"small"} appearance={"outline"}
+                            onClick={() => insertFormElementField(idx, defaultEntryData)}
                             icon={<AddFilled/>}>Add Before</Button>
                     <Button size={"small"} appearance={"transparent"} onClick={() => removeFormElementField(idx)}
                             icon={<DeleteRegular/>}/>
