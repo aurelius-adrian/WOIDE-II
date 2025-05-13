@@ -43,3 +43,33 @@ export const timedHighlightAnnotationID = (a: Annotation | string, timeout: numb
         removeHighlightAnnotationID(a);
     }, timeout);
 }
+
+export const getAnnotationTextByID = async (a: Annotation | string): Promise<string | null> => {
+    const id = typeof a === "string" ? a : a.id;
+  
+    return await Word.run(async (context) => {
+      const start = context.document.contentControls.getByTag(idSalt + '_s' + id);
+      const end = context.document.contentControls.getByTag(idSalt + '_e' + id);
+  
+      start.load('items');
+      end.load('items');
+  
+      await context.sync();
+  
+      if (start.items.length === 0 || end.items.length === 0) {
+        console.warn("No content controls found for annotation:", id);
+        return null;
+      }
+  
+      const startRange = start.items[0].getRange();
+      const endRange = end.items[0].getRange();
+  
+      const annotationRange = _getAnnotationRange(startRange, endRange);
+      annotationRange.load("text");
+  
+      await context.sync();
+  
+      return annotationRange.text;
+    });
+  };
+  
