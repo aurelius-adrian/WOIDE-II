@@ -1,66 +1,93 @@
-import React, {forwardRef, useImperativeHandle} from "react";
-import {FormProvider, SubmitHandler, useForm} from "react-hook-form";
+import React, { forwardRef, useImperativeHandle } from "react";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import FormElement from "./FormElement";
-import {FormElementSelectorData} from "./formElements/FormElementSelector";
-import {SelectOptionsData} from "./formElements/SelectOptions";
+import { FormElementSelectorData } from "./formElements/FormElementSelector";
+import { SelectOptionsData } from "./formElements/SelectOptions";
 
-export const ExternalFormElementTypesList = ["textInput", "select", "selectAnnotation"] as const;
-export const InternalFormElementTypesList = ["formElementSelector", "selectOptions"] as const;
-export const FormElementTypesList = [...ExternalFormElementTypesList, ...InternalFormElementTypesList] as const;
+export const ExternalFormElementTypesList = [
+  "textInput",
+  "select",
+  "selectAnnotation",
+] as const;
+export const InternalFormElementTypesList = [
+  "formElementSelector",
+  "selectOptions",
+] as const;
+export const FormElementTypesList = [
+  ...ExternalFormElementTypesList,
+  ...InternalFormElementTypesList,
+] as const;
 export type FormElementTypes = (typeof FormElementTypesList)[number];
-export type FormFieldData = string | FormElementSelectorData | SelectOptionsData[];
+export type FormFieldData =
+  | string
+  | FormElementSelectorData
+  | SelectOptionsData[];
 
 export type FormElementDescription = {
-    id: string;
-    label: string;
-    type: FormElementTypes;
-    options?: { value: string, label: string }[]; // select
-    allowedAnnotationTypes?: string[]; // selectAnnotation
-}
+  id: string;
+  label: string;
+  type: FormElementTypes;
+  options?: { value: string; label: string }[]; // select
+  allowedAnnotationTypes?: string[]; // selectAnnotation
+};
 
 export type FormDescription = FormElementDescription[];
 
 export type FormData = {
-    [key: string]: FormFieldData
-}
+  [key: string]: FormFieldData;
+};
 
 export type AnnotationFormApi = {
-    submit: () => Promise<FormData | null>;
-}
+  submit: () => Promise<FormData | null>;
+  reset: () => void;
+  update: (data: FormData) => void;
+};
 
-export const Form = forwardRef<AnnotationFormApi, {
-    formDescription: FormDescription,
-    formData?: FormData
+export const Form = forwardRef<
+  AnnotationFormApi,
+  {
+    formDescription: FormDescription;
+    formData?: FormData;
     onChange?: (e: any) => void;
-}>(({formDescription, formData, onChange}, ref) => {
+  }
+>(({ formDescription, formData, onChange }, ref) => {
+  const methods = useForm({
+    defaultValues: formData,
+  });
+  const { handleSubmit } = methods;
 
-    const methods = useForm({
-        defaultValues: formData
-    });
-    const {handleSubmit} = methods;
+  useImperativeHandle(ref, () => ({
+    submit: async () => {
+      let ret = null;
+      await methods.handleSubmit((data) => (ret = data))();
+      return ret;
+    },
+    reset: () => {
+      methods.reset();
+    },
+    update: (data: FormData) => {
+      methods.reset(data);
+    },
+  }));
 
-    useImperativeHandle(ref, () => ({
-        submit: async () => {
-            let ret = null;
-            await methods.handleSubmit((data) => ret = data)()
-            return ret;
-        },
-    }));
+  const onSubmit: SubmitHandler<any> = (data) => {
+    console.log(data);
+  };
 
-    const onSubmit: SubmitHandler<any> = (data) => {
-        console.log(data);
-    };
-
-    return <>
-        <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} onChange={onChange}>
-                <div className={"flex flex-col"}>
-                    {formDescription.map((e, i) => <FormElement key={i} description={e}/>)}
-                </div>
-            </form>
-        </FormProvider>
+  return (
+    <>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} onChange={onChange}>
+          <div className={"flex flex-col"}>
+            {formDescription.map((e, i) => (
+              <FormElement key={i} description={e} />
+            ))}
+          </div>
+        </form>
+      </FormProvider>
     </>
+  );
 });
 
-Form.displayName = 'Form';
+Form.displayName = "Form";
 export default Form;
