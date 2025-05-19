@@ -1,10 +1,13 @@
 import {insertAnnotation} from "../../lib/annotation-api/annotations";
 import {highlightAnnotationID} from "../../lib/annotation-api/navigation";
 import {Button} from "@fluentui/react-button";
-import React from "react";
+import React, {useRef} from "react";
 
 
 const Test = () => {
+
+    const dialog = useRef<Office.Dialog>();
+
     const test_1 = async () => {
         await Word.run(async (context) => {
             const text = `Einfluss von Temperaturänderungen auf die Photosyntheseleistung von Pflanzen
@@ -30,18 +33,19 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     }
 
     const test_3 = async () => {
-        await Word.run(async (context) => {
-            const range: Word.Range = context.document.getSelection().getRange();
-            const ooxml = range.getOoxml();
-            await context.sync();
-            let e = document.getElementById("output");
-            if (e) e.innerHTML += ooxml.value;
-            console.log(ooxml.value);
-        });
+        dialog.current?.messageChild("Test!!!! Woaaa");
     }
 
     const test_4 = async () => {
-        console.log("asd");
+        Office.context.ui.displayDialogAsync("https://localhost:3050/test", { height: 80, width: 80, displayInIframe: false }, (res) => {
+            dialog.current = res.value;
+            dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+            dialog.current?.messageChild("Test!!!! Woaaa");
+        });
+    }
+
+    function processMessage(arg: any) {
+        dialog.current?.close();
     }
 
     return <div className={"rounded-lg border-red-700 border-2 p-2 mt-4 space-y-2"}>
@@ -61,7 +65,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
             </Button>
         </div>
         <div className={"font-bold text-xl text-red-700"}>Output</div>
-        <div id={"ouput"}/>
+        <div id={"output"}/>
     </div>
 }
 

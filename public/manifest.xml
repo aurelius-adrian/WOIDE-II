@@ -6,8 +6,8 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="WOIDE II"/>
   <Description DefaultValue="A template to get started."/>
-  <IconUrl DefaultValue="https://localhost:3000/favicon.ico"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/favicon.ico"/>
+  <IconUrl DefaultValue="https://localhost:3050/favicon.ico"/>
+  <HighResolutionIconUrl DefaultValue="https://localhost:3050/favicon.ico"/>
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
   <AppDomains>
     <AppDomain>https://www.contoso.com</AppDomain>
@@ -21,7 +21,7 @@
     </Sets>
   </Requirements>
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://localhost:3000/taskpane"/>
+    <SourceLocation DefaultValue="https://localhost:3050/taskpane"/>
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
@@ -70,25 +70,25 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/favicon.ico"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/favicon.ico"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/favicon.ico"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3050/favicon.ico"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3050/favicon.ico"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3050/favicon.ico"/>
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812"/>
-        <bt:Url id="Commands.Url" DefaultValue="https://localhost:3000/commands.html" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://localhost:3050/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3050/taskpane"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="Get started with your sample add-in!"/>
+        <bt:String id="GetStarted.Title" DefaultValue="Get started with WOIDE!"/>
         <bt:String id="CommandsGroup.Label" DefaultValue="Commands Group"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Taskpane"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="WODE"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="GetStarted.Description" DefaultValue="Your sample add-in loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show a Taskpane"/>
+        <bt:String id="GetStarted.Description" DefaultValue="WOIDE II succesfully loaded. Go to the HOME tab and click the 'WOIDE' button to get started."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to open WOIDE"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
-  <ExtendedOverrides Url="https://localhost:3000/shortcuts.json"></ExtendedOverrides>
+  <ExtendedOverrides Url="https://localhost:3050/shortcuts.json"></ExtendedOverrides>
 </OfficeApp>
