@@ -19,7 +19,6 @@ export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () =
         ccs.load();
         await context.sync();
         const list = selection.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
-        console.log(list);
         return list.map(e => {
             return {
                 id: e.tag.slice(idSalt.length + 2),
@@ -36,7 +35,6 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
         ccs.load();
         await context.sync();
         const list = context.document.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
-        console.log(list);
         return list.map(e => {
             return {
                 id: e.tag.slice(idSalt.length + 2),
@@ -84,7 +82,47 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
 
     return ret;
 }
+export const updateAnnotation = async (AnnotationToUpdateID: string,props: AnnotationProperties = {}): Promise<void> => {
+
+    await Word.run(async (context) => {
+        const contentControls = context.document.contentControls;
+        contentControls.load();
+        await context.sync();
+    
+        const toUpdate = contentControls.items.filter(cc => 
+          cc.tag === `${idSalt}_s${AnnotationToUpdateID}` 
+        );
+        toUpdate[0].cannotEdit = false;
+        toUpdate[0].title = props.data ?? "";
+        await context.sync();
+        
+      });
+}
 
 export const _getAnnotationRange = (start: Word.Range, end: Word.Range): Word.Range => {
     return start.expandTo(end);
 }
+
+export const deleteAnnotation = async (annotationId: string): Promise<void> => {
+    await Word.run(async (context) => {
+        
+      const contentControls = context.document.contentControls;
+      contentControls.load();
+      await context.sync();
+  
+      const toDelete = contentControls.items.filter(cc => 
+        cc.tag === `${idSalt}_s${annotationId}` || 
+        cc.tag === `${idSalt}_e${annotationId}`
+      );
+
+      toDelete.forEach(cc => {
+        cc.cannotEdit = false
+        cc.insertText("", Word.InsertLocation.replace);
+        cc.delete(true); 
+      });
+      
+      await context.sync();
+    });
+  };
+  
+  
