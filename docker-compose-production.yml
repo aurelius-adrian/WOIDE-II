@@ -1,4 +1,4 @@
-name: WOIDE-II
+name: woide
 services:
   frontend:
     container_name: WOIDE-II
