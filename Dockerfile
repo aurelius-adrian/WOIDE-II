@@ -16,6 +16,9 @@ RUN npm install
 # Copy over the project
 ADD . .
 
+# Build next build
+RUN npm run build
+
 # Expose port
 EXPOSE 3000
 

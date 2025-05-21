@@ -1,0 +1,8 @@
+name: WOIDE-II
+services:
+  frontend:
+    container_name: WOIDE-II
+    build: .
+    command: npm run start
+    ports:
+      - "3050:3000"
