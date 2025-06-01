@@ -73,6 +73,7 @@ export const AnnotationEditor = ({
         ...editAnnotationData,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAnnotationType]);
 
   const addAnnotation = async () => {

@@ -1,12 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  Accordion,
-  AccordionHeader,
-  AccordionItem,
-  AccordionPanel,
-} from "@fluentui/react-accordion";
-import { DeleteRegular, EyeFilled, InfoRegular } from "@fluentui/react-icons";
+
+import { DeleteRegular, EyeFilled } from "@fluentui/react-icons";
 import { Button, ToggleButton } from "@fluentui/react-button";
 import {
   deleteAnnotation,
@@ -36,6 +31,16 @@ export const AnnotationView = ({
   setEditMode,
   setEditAnnotation,
 }: AnnotationViewProps) => {
+  const [annotationText, setAnnotationText] = useState("");
+
+  useEffect(() => {
+    const fetchAnnotationText = async () => {
+      const text = await getAnnotationTextByID(currentAnnotation.id);
+      setAnnotationText(text ? text.replace(/[❭❬]/g, "") : "");
+    };
+    fetchAnnotationText();
+  }, [currentAnnotation]);
+
   const _getAnnotations = async () => {
     getAnnotations().then((ann) => updateAnnotations(ann));
   };
@@ -56,10 +61,6 @@ export const AnnotationView = ({
       });
     }
   };
-  const getAnnotationText = async () => {
-    const text = await getAnnotationTextByID(currentAnnotation.id);
-    return text ? text.replace(/[❭❬]/g, "") : "";
-  };
 
   const editAnnotation = (annotationToEdit: Annotation) => {
     setEditAnnotation(annotationToEdit);
@@ -75,7 +76,7 @@ export const AnnotationView = ({
               : "Annotation Type Misssing"}
           </div>
 
-          <div className="text-xs line-clamp-2">{getAnnotationText()}</div>
+          <div className="text-xs line-clamp-2">{annotationText}</div>
           <div className="mt-3 ml-auto flex justify-end space-x-2">
             <Button
               icon={<EditRegular />}
