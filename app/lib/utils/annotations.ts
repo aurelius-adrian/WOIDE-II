@@ -1,17 +1,8 @@
-import {FormDescription} from "../../[locale]/components/Form";
-
-export class Annotations {
-    constructor() {
-    }
-
-
-}
+import { FormDescription } from "../../[locale]/components/Form";
 
 export type AnnotationType = {
-    id?: string,
-    name: string,
-    description?: string,
-    formDescription: FormDescription,
-}
-
-export type InputField = {}
+    id?: string;
+    name: string;
+    description?: string;
+    formDescription: FormDescription;
+};

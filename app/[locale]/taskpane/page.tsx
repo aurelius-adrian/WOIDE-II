@@ -1,23 +1,21 @@
 "use client";
-import React, {useEffect, useState} from "react";
-import {Accordion, AccordionHeader, AccordionItem, AccordionPanel,} from "@fluentui/react-accordion";
-import {EditRegular, EyeFilled, InfoRegular} from "@fluentui/react-icons";
-import {Button} from "@fluentui/react-button";
-import {getAnnotations} from "../../lib/annotation-api/annotations";
-import {Annotation} from "../../lib/annotation-api/types";
+import React, { useEffect, useState } from "react";
+import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
+import { EditRegular, EyeFilled, InfoRegular } from "@fluentui/react-icons";
+import { Button } from "@fluentui/react-button";
+import { getAnnotations } from "../../lib/annotation-api/annotations";
+import { Annotation } from "../../lib/annotation-api/types";
 import AnnotationEditor from "../components/AnnotationEditor";
-import {useTranslations} from "next-intl";
+import { useTranslations } from "next-intl";
 import AnnotationView from "../components/AnnotationView";
-import {highlightAnnotationID, removeHighlightAnnotationID,} from "../../lib/annotation-api/navigation";
+import { highlightAnnotationID, removeHighlightAnnotationID } from "../../lib/annotation-api/navigation";
 
 export default function TaskPanePage() {
     const t = useTranslations("TaskPane");
 
     const [edit, setEdit] = useState<boolean>(true);
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
-    const [annotationToEdit, setannotationToEdit] = useState<Annotation | null>(
-        null
-    );
+    const [annotationToEdit, setannotationToEdit] = useState<Annotation | null>(null);
 
     useEffect(() => {
         if (edit) _getAnnotations();
@@ -36,30 +34,24 @@ export default function TaskPanePage() {
         <div>
             <Accordion collapsible={true} className={"-ml-3 mb-3"}>
                 <AccordionItem value="1">
-                    <AccordionHeader
-                        expandIconPosition="end"
-                        expandIcon={<InfoRegular/>}
-                    >
+                    <AccordionHeader expandIconPosition="end" expandIcon={<InfoRegular />}>
                         {t("header")}
                     </AccordionHeader>
                     <AccordionPanel>
                         <div>{t("description")}</div>
                         <div>
                             {t("sub-desc1")}{" "}
-                            <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>
-                                {t("sub-desc2")}
-                            </a>
+                            <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>{t("sub-desc2")}</a>
                         </div>
                     </AccordionPanel>
                 </AccordionItem>
             </Accordion>
             <div className={"mb-4"}>
                 <Button
-                    icon={!edit ? <EditRegular/> : <EyeFilled/>}
+                    icon={!edit ? <EditRegular /> : <EyeFilled />}
                     onClick={() => {
                         setEdit(!edit);
-                        annotationToEdit &&
-                        removeHighlightAnnotationID(annotationToEdit.id);
+                        if (annotationToEdit) removeHighlightAnnotationID(annotationToEdit.id);
                         setannotationToEdit(null);
                     }}
                 >

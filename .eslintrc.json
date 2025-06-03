@@ -1,3 +1,84 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": [
+    "next/core-web-vitals",
+    "next",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "off",
+      {
+        "tabWidth": 4,
+        "useTabs": false,
+        "semi": true,
+        "singleQuote": false,
+        "trailingComma": "all",
+        "printWidth": 120,
+        "bracketSpacing": true,
+        "arrowParens": "always"
+      }
+    ],
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "max-len": [
+      "warn",
+      {
+        "code": 120
+      }
+    ],
+    "object-curly-spacing": [
+      "off",
+      "always"
+    ],
+    "arrow-parens": [
+      "error",
+      "always"
+    ],
+    "no-useless-escape": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-empty-interface": "warn",
+    "@typescript-eslint/prefer-as-const": "error",
+    "@typescript-eslint/no-unused-expressions": "error",
+    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/no-this-alias": "error",
+    "react/no-children-prop": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react/jsx-key": "error",
+    "prefer-const": "warn",
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "error",
+          "warn",
+          "debug"
+        ]
+      }
+    ],
+    "no-debugger": "warn",
+    "eqeqeq": [
+      "warn",
+      "always"
+    ]
+  }
 }
+

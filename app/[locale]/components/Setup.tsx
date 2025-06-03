@@ -1,52 +1,52 @@
-'use client'
+"use client";
 import Navbar from "./Navbar";
-import {webDarkTheme, webLightTheme} from "@fluentui/tokens";
-import {FluentProvider} from "@fluentui/react-provider";
-import React, {createContext, useContext, useEffect} from "react";
+import { webDarkTheme, webLightTheme } from "@fluentui/tokens";
+import { FluentProvider } from "@fluentui/react-provider";
+import React, { createContext, useContext, useEffect } from "react";
 import Script from "next/script";
-import {SnackbarProvider} from "notistack";
+import { SnackbarProvider } from "notistack";
 
 const DarkModeContext = createContext<{
-    darkMode: any,
-    setDarkMode: any,
+    darkMode: any;
+    setDarkMode: any;
 }>({
-    darkMode: false, setDarkMode: () => {
-    }
+    darkMode: false,
+    setDarkMode: () => {},
 });
 
 const OfficeReadyContext = createContext<boolean>(false);
 
-export default function Setup({children}: { children: any }) {
-
+export default function Setup({ children }: { children: any }) {
     const [darkMode, setDarkMode] = React.useState(false);
     const [theme, setTheme] = React.useState(webLightTheme);
 
     const [officeReady, setOfficeReady] = React.useState(false);
 
     useEffect(() => {
-        setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
     }, []);
 
     useEffect(() => {
         if (darkMode) {
-            document.documentElement.classList.add('dark')
+            document.documentElement.classList.add("dark");
             setTheme(webDarkTheme);
         } else {
-            document.documentElement.classList.remove('dark')
+            document.documentElement.classList.remove("dark");
             setTheme(webLightTheme);
         }
     }, [darkMode]);
 
     const initOfficeJS = async () => {
         window.Office.onReady(() => {
-            console.log('WOIDE II initialized Office JS');
+            console.log("WOIDE II initialized Office JS");
             setOfficeReady(true);
-            window.history.replaceState = function () {
-            }
+            window.history.replaceState = function() {
+            };
         });
 
         Office.actions.associate("ShowTaskpane", () => {
-            return Office.addin.showAsTaskpane()
+            return Office.addin
+                .showAsTaskpane()
                 .then(() => {
                     return;
                 })
@@ -56,7 +56,8 @@ export default function Setup({children}: { children: any }) {
         });
 
         Office.actions.associate("HideTaskpane", () => {
-            return Office.addin.hide()
+            return Office.addin
+                .hide()
                 .then(() => {
                     return;
                 })
@@ -64,28 +65,30 @@ export default function Setup({children}: { children: any }) {
                     return error.code;
                 });
         });
-    }
+    };
 
     return (
         <div>
-            <Script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
-                    onLoad={initOfficeJS}
-                    onError={console.error}
+            <Script
+                type="text/javascript"
+                src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
+                onLoad={initOfficeJS}
+                onError={console.error}
             />
-            <DarkModeContext.Provider value={{darkMode, setDarkMode}}>
+            <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
                 <SnackbarProvider>
                     <OfficeReadyContext.Provider value={officeReady}>
                         <FluentProvider theme={theme}>
                             <nav>
-                                <Navbar/>
+                                <Navbar />
                             </nav>
-                            <main className={'bg-light-bg dark:bg-dark-bg p-3'}>{children}</main>
+                            <main className={"bg-light-bg dark:bg-dark-bg p-3"}>{children}</main>
                         </FluentProvider>
                     </OfficeReadyContext.Provider>
                 </SnackbarProvider>
             </DarkModeContext.Provider>
         </div>
-    )
+    );
 }
 
 export const useDarkModeContext = () => useContext(DarkModeContext);

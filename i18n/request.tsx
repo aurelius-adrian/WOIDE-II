@@ -1,6 +1,6 @@
-import {notFound} from "next/navigation";
-import {getRequestConfig} from "next-intl/server";
-import {headers} from "next/headers";
+import { notFound } from "next/navigation";
+import { getRequestConfig } from "next-intl/server";
+import { headers } from "next/headers";
 
 const locales = ["en", "de"];
 

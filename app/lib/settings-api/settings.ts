@@ -59,7 +59,7 @@ export async function getAllDocumentSettings(): Promise<Record<string, any>> {
             await context.sync();
 
             const allSettings: Record<string, any> = {};
-            settings.items.forEach(setting => {
+            settings.items.forEach((setting) => {
                 try {
                     allSettings[setting.key] = JSON.parse(setting.value); // Deserialize JSON if possible
                 } catch {
