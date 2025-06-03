@@ -132,6 +132,7 @@ export const AnnotationEditor = ({
           formRef.current?.reset();
           const selectedId = e.target.value;
           const selected = annotationTypes[parseInt(selectedId)];
+          setAnnotationIndex(String(selectedId));
           setSelectedAnnotationType(selected);
         }}
       >
