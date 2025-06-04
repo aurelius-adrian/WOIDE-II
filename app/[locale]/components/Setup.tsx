@@ -1,5 +1,4 @@
 'use client'
-import Navbar from "./Navbar";
 import {webDarkTheme, webLightTheme} from "@fluentui/tokens";
 import {FluentProvider} from "@fluentui/react-provider";
 import React, {createContext, useContext, useEffect} from "react";
@@ -76,9 +75,6 @@ export default function Setup({children}: { children: any }) {
                 <SnackbarProvider>
                     <OfficeReadyContext.Provider value={officeReady}>
                         <FluentProvider theme={theme}>
-                            <nav>
-                                <Navbar/>
-                            </nav>
                             <main className={'bg-light-bg dark:bg-dark-bg p-3'}>{children}</main>
                         </FluentProvider>
                     </OfficeReadyContext.Provider>

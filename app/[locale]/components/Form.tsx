@@ -39,6 +39,7 @@ export type FormData = {
 
 export type AnnotationFormApi = {
     submit: () => Promise<FormData | null>;
+    getFormData: () => FormData;
     reset: () => void;
     update: (data: FormData) => void;
 };
@@ -67,6 +68,9 @@ export const Form = forwardRef<
         },
         update: (data: FormData) => {
             methods.reset(data);
+        },
+        getFormData: () => {
+            return getValues();
         },
     }));
 

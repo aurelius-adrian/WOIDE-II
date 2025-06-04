@@ -68,7 +68,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
             description: "Test Annotation Type"
         }
 
-        Office.context.ui.displayDialogAsync(`https://localhost:3050/test?data=${btoa(JSON.stringify(data))}`, {
+        Office.context.ui.displayDialogAsync(`https://localhost:3050/templating?data=${btoa(JSON.stringify(data))}`, {
             height: 80,
             width: 80,
             displayInIframe: false
