@@ -13,6 +13,7 @@ export const EditAnnotationType = ({
 }) => {
     const formApi = useRef<AnnotationFormApi>(null);
     const [tmpId, setTmpId] = useState<string | null>(null);
+    const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>(annotationType.exportData);
 
     const dialog = useRef<Office.Dialog>();
 
@@ -20,7 +21,7 @@ export const EditAnnotationType = ({
         setTmpId(annotationType.id ?? v4());
     }, [annotationType]);
 
-    const saveAnnotationType = async () => {
+    const saveAnnotationType = async (_exportData?: unknown) => {
         try {
             const data = await formApi.current?.submit();
             if (!data) {
@@ -37,6 +38,7 @@ export const EditAnnotationType = ({
                     "annotationTypes",
                     prevAnnotationTypes.with(idx, {
                         ...data,
+                        exportData: _exportData || exportData,
                         id: tmpId,
                     } as AnnotationType),
                 );
@@ -45,6 +47,7 @@ export const EditAnnotationType = ({
                     ...prevAnnotationTypes,
                     {
                         ...data,
+                        exportData: _exportData || exportData,
                         id: tmpId,
                     },
                 ]);
@@ -88,18 +91,29 @@ export const EditAnnotationType = ({
     };
 
     function processMessage(arg: any) {
-        dialog.current?.close();
+        try {
+            const data = JSON.parse(arg.message);
+            setExportData(data);
+            saveAnnotationType(data);
+        } catch (e) {
+            console.error("could not parse/save export template data: ", e);
+            dialog.current?.messageChild("error");
+            return;
+        }
+        dialog.current?.messageChild("success");
     }
 
     const openDialog = () => {
-        Office.context.ui.displayDialogAsync(`https://localhost:3050/templating?data=${btoa(JSON.stringify(formApi.current?.getFormData()))}`, {
+        Office.context.ui.displayDialogAsync(`https://localhost:3050/templating?data=${btoa(JSON.stringify({
+            ...formApi.current?.getFormData(),
+            exportData,
+        }))}`, {
             height: 80,
             width: 80,
             displayInIframe: false,
         }, (res) => {
             dialog.current = res.value;
             dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
-            dialog.current?.messageChild("Test!!!! Woaaa");
         });
     };
 

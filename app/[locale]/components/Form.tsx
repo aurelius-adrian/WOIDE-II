@@ -21,7 +21,8 @@ export type FormElementTypes = (typeof FormElementTypesList)[number];
 export type FormFieldData =
     | string
     | FormElementSelectorData
-    | SelectOptionsData[];
+    | SelectOptionsData[]
+    | {[key: string]: string | undefined};
 
 export type FormElementDescription = {
     id: string;
