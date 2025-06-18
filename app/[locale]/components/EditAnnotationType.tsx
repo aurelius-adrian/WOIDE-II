@@ -24,11 +24,18 @@ export const EditAnnotationType = ({
   const saveAnnotationType = async () => {
     try {
       const data = await formApi.current?.submit();
-      if (!data) {
-        console.error("Error getting AnnotationTypeData");
+      const hasMissingId =
+        data?.formDescription &&
+        Object.values(data?.formDescription).some((field) => !field.id);
+
+      if (!data || hasMissingId) {
+        enqueueSnackbar({
+          message: "Complete the form to add annotation type.",
+          variant: "error",
+          autoHideDuration: 5000,
+        });
         return;
       }
-
       const prevAnnotationTypes = ((await getDocumentSetting(
         "annotationTypes"
       )) ?? []) as AnnotationType[];
@@ -98,11 +105,13 @@ export const EditAnnotationType = ({
               id: "name",
               type: "textInput",
               label: "Annotation Type Name",
+              required: true,
             },
             {
               id: "formDescription",
               type: "formElementSelector",
               label: "Form Description",
+              required: true,
             },
           ]}
           formData={annotationType}
