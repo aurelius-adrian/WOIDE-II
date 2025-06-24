@@ -77,9 +77,18 @@ export const AnnotationEditor = ({
   }, [selectedAnnotationType]);
 
   const addAnnotation = async () => {
-    const data = await formRef.current?.submit();
-    const annotationDetailedData = { ...data, ...selectedAnnotationType };
     try {
+      const data = await formRef.current?.submit();
+      if (!data) {
+        enqueueSnackbar({
+          message: "Complete the form to add annotation type.",
+          variant: "error",
+          autoHideDuration: 5000,
+        });
+        return;
+      }
+      const annotationDetailedData = { ...data, ...selectedAnnotationType };
+
       await insertAnnotation({
         data: JSON.stringify(annotationDetailedData),
       });
@@ -99,9 +108,18 @@ export const AnnotationEditor = ({
     }
   };
   const updateAnnotationData = async () => {
-    const data = await formRef.current?.submit();
-    const annotationDetailedData = { ...data, ...selectedAnnotationType };
     try {
+      const data = await formRef.current?.submit();
+      if (!data) {
+        enqueueSnackbar({
+          message: "Complete the form to add annotation type.",
+          variant: "error",
+          autoHideDuration: 5000,
+        });
+        return;
+      }
+      const annotationDetailedData = { ...data, ...selectedAnnotationType };
+
       await updateAnnotation(editAnnotation?.id ?? "", {
         data: JSON.stringify(annotationDetailedData),
       });
