@@ -66,7 +66,7 @@ export default function Setup({ children }: { children: any }) {
     };
 
     return (
-        <div>
+        <>
             <Script
                 type="text/javascript"
                 src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"
@@ -76,13 +76,13 @@ export default function Setup({ children }: { children: any }) {
             <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
                 <SnackbarProvider>
                     <OfficeReadyContext.Provider value={officeReady}>
-                        <FluentProvider theme={theme}>
-                            <main className={"bg-light-bg dark:bg-dark-bg"}>{children}</main>
+                        <FluentProvider theme={theme} className={"h-full"}>
+                            <main className={"bg-light-bg dark:bg-dark-bg h-full"}>{children}</main>
                         </FluentProvider>
                     </OfficeReadyContext.Provider>
                 </SnackbarProvider>
             </DarkModeContext.Provider>
-        </div>
+        </>
     );
 }
 

@@ -1,5 +1,9 @@
-"use client";
+"use server";
 
-export default function Main() {
-    return <div>This is the index page.</div>;
+import { redirect } from "next/navigation";
+
+export async function Main() {
+    redirect("/home");
 }
+
+export default Main;
