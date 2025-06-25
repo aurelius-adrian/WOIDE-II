@@ -45,6 +45,15 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
     });
 }
 
+export const getAnnotationContentControls = async () => {
+    return await Word.run(async (context) => {
+        const ccs = context.document.contentControls;
+        ccs.load();
+        await context.sync();
+        return context.document.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
+    });
+}
+
 export const insertAnnotation = async (props: AnnotationProperties = {}): Promise<Annotation | null> => {
     let ret = null;
     await Word.run(async (context) => {
@@ -82,6 +91,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
 
     return ret;
 }
+
 export const updateAnnotation = async (AnnotationToUpdateID: string,props: AnnotationProperties = {}): Promise<void> => {
 
     await Word.run(async (context) => {
