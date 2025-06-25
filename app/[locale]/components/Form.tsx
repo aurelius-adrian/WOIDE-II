@@ -29,6 +29,7 @@ export type FormElementDescription = {
   type: FormElementTypes;
   options?: { value: string; label: string }[]; // select
   allowedAnnotationTypes?: string[]; // selectAnnotation
+  required?: boolean; // textInput, select, selectAnnotation
 };
 
 export type FormDescription = FormElementDescription[];
