@@ -25,11 +25,12 @@ export type FormFieldData =
     | {[key: string]: string | undefined};
 
 export type FormElementDescription = {
-    id: string;
-    label: string;
-    type: FormElementTypes;
-    options?: { value: string; label: string }[]; // select
-    allowedAnnotationTypes?: string[]; // selectAnnotation
+  id: string;
+  label: string;
+  type: FormElementTypes;
+  options?: { value: string; label: string }[]; // select
+  allowedAnnotationTypes?: string[]; // selectAnnotation
+  required?: boolean; // textInput, select, selectAnnotation
 };
 
 export type FormDescription = FormElementDescription[];
