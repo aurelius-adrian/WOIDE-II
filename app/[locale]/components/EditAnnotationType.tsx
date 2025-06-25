@@ -103,13 +103,19 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
     }
 
     const openDialog = () => {
-        Office.context.ui.displayDialogAsync(
-            `https://localhost:3050/templating?data=${btoa(
+        const url = new URL("/templating", window.origin);
+        url.searchParams.append(
+            "data",
+            btoa(
                 JSON.stringify({
                     ...formApi.current?.getFormData(),
                     exportData,
                 }),
-            )}`,
+            ),
+        );
+
+        Office.context.ui.displayDialogAsync(
+            url.href,
             {
                 height: 80,
                 width: 80,
