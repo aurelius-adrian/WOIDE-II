@@ -148,7 +148,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 <Button onClick={openDialog}>Edit Export Settings</Button>
             </div>
             <div className={"flex flex-row space-x-2"}>
-                <Button onClick={saveAnnotationType}>Save Annotation Type</Button>
+                <Button onClick={() => saveAnnotationType()}>Save Annotation Type</Button>
                 <Button onClick={deleteAnnotationType}>Delete Annotation Type</Button>
             </div>
         </div>
