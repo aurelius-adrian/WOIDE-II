@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import {Button} from "@fluentui/react-button";
 import {Select} from "@fluentui/react-select";

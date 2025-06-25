@@ -1,9 +1,9 @@
 'use client'
 
 import {useState} from "react";
-import {ViewAnnotationTypes} from "../components/ViewAnnotationTypes";
-import {AnnotationType} from "../../lib/utils/annotations";
-import {EditAnnotationType} from "../components/EditAnnotationType";
+import {ViewAnnotationTypes} from "../../components/ViewAnnotationTypes";
+import {AnnotationType} from "../../../lib/utils/annotations";
+import {EditAnnotationType} from "../../components/EditAnnotationType";
 import {Button} from "@fluentui/react-button";
 import {ArrowReplyRegular} from "@fluentui/react-icons";
 

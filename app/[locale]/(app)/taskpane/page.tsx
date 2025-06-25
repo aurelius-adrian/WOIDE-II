@@ -1,14 +1,14 @@
 "use client";
-import React, {useEffect, useState} from "react";
-import {Accordion, AccordionHeader, AccordionItem, AccordionPanel,} from "@fluentui/react-accordion";
-import {EditRegular, EyeFilled, InfoRegular} from "@fluentui/react-icons";
-import {Button} from "@fluentui/react-button";
-import {getAnnotations} from "../../lib/annotation-api/annotations";
-import {Annotation} from "../../lib/annotation-api/types";
-import AnnotationEditor from "../components/AnnotationEditor";
-import {useTranslations} from "next-intl";
-import AnnotationView from "../components/AnnotationView";
-import {highlightAnnotationID, removeHighlightAnnotationID,} from "../../lib/annotation-api/navigation";
+import React, { useEffect, useState } from "react";
+import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
+import { EditRegular, EyeFilled, InfoRegular } from "@fluentui/react-icons";
+import { Button } from "@fluentui/react-button";
+import { getAnnotations } from "../../../lib/annotation-api/annotations";
+import { Annotation } from "../../../lib/annotation-api/types";
+import AnnotationEditor from "../../components/AnnotationEditor";
+import { useTranslations } from "next-intl";
+import AnnotationView from "../../components/AnnotationView";
+import { highlightAnnotationID, removeHighlightAnnotationID } from "../../../lib/annotation-api/navigation";
 
 export default function TaskPanePage() {
     const t = useTranslations("TaskPane");

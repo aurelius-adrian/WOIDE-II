@@ -12,6 +12,7 @@ export type AnnotationType = {
     name: string,
     description?: string,
     formDescription: FormDescription,
+    exportData: {[key: string]: string}
 }
 
 export type InputField = {}
