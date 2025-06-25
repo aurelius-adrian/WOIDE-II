@@ -88,7 +88,6 @@ const SelectOption = ({ description }: SelectOptionsProps) => {
                         />
                     </div>
                     {getDescription(`${description.id}.${idx}`).map((e, idx) => {
-                        console.log(e);
                         return <FormElement key={idx} description={e} />;
                     })}
                 </AccordionPanel>

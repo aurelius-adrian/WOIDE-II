@@ -140,7 +140,6 @@ const FormElementSelect = ({ description }: FormElementSelectorProps) => {
                         />
                     </div>
                     {getDescription(`${description.id}.${idx}`, e.type).map((e, idx) => {
-                        console.log(e);
                         return <FormElement key={idx} description={e} />;
                     })}
                 </AccordionPanel>

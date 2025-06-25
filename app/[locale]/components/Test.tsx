@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { insertAnnotation } from "../../lib/annotation-api/annotations";
 import { highlightAnnotationID } from "../../lib/annotation-api/navigation";
 import { Button } from "@fluentui/react-button";
@@ -26,7 +27,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         insertAnnotation({
             data: "",
         }).then((r) => {
-            if (r != null) highlightAnnotationID(r).then(() => {});
+            if (r !== null) highlightAnnotationID(r).then(() => {});
         });
     };
 
@@ -65,6 +66,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
                     ],
                 },
             ],
+            exportData: {},
             description: "Test Annotation Type",
         };
 

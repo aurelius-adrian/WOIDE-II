@@ -12,11 +12,13 @@ import Test from "./Test";
 import { enqueueSnackbar } from "notistack";
 import { Annotation } from "../../lib/annotation-api/types";
 import { removeHighlightAnnotationID } from "../../lib/annotation-api/navigation";
+
 interface AnnotationEditorProps {
-    setEditMode: Function;
-    updateAnnotations: Function;
+    setEditMode: (v: boolean) => void;
+    updateAnnotations: (a: Annotation[]) => void;
     editAnnotation?: Annotation | null;
 }
+
 export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotation }: AnnotationEditorProps) => {
     const _getAnnotations = async () => {
         await getAnnotations().then((ann) => updateAnnotations(ann));
@@ -116,8 +118,10 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 autoHideDuration: 2000,
             });
             _getAnnotations();
-            editAnnotation?.id && removeHighlightAnnotationID(editAnnotation?.id);
-            setEditMode(false);
+            if (editAnnotation?.id) {
+                removeHighlightAnnotationID(editAnnotation?.id);
+                setEditMode(false);
+            }
         } catch {
             enqueueSnackbar({
                 message: "Failed to update annotation.",

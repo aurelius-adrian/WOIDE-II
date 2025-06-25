@@ -1,9 +1,5 @@
 import { FormDescription } from "../../[locale]/components/Form";
 
-export class Annotations {
-    constructor() {}
-}
-
 export type AnnotationType = {
     id?: string;
     name: string;
@@ -11,5 +7,3 @@ export type AnnotationType = {
     formDescription: FormDescription;
     exportData: { [key: string]: string };
 };
-
-export type InputField = {};

@@ -33,8 +33,8 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
             }
 
             const prevAnnotationTypes = ((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[];
-            const idx = prevAnnotationTypes.findIndex((e) => e.id == tmpId);
-            if (idx != -1) {
+            const idx = prevAnnotationTypes.findIndex((e) => e.id === tmpId);
+            if (idx !== -1) {
                 setDocumentSetting(
                     "annotationTypes",
                     prevAnnotationTypes.with(idx, {
@@ -73,7 +73,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
             const prevAnnotationTypes = ((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[];
             setDocumentSetting(
                 "annotationTypes",
-                prevAnnotationTypes.filter((e) => e.id != annotationType.id),
+                prevAnnotationTypes.filter((e) => e.id !== annotationType.id),
             );
             enqueueSnackbar({
                 message: "Deleting Annotation Successful.",

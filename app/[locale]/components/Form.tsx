@@ -67,7 +67,7 @@ export const Form = forwardRef<
     }));
 
     const onSubmit: SubmitHandler<any> = (data) => {
-        console.log(data);
+        console.debug(data);
     };
 
     const onChangeWrapper = () => {

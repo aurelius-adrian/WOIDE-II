@@ -4,12 +4,11 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Button } from "@fluentui/react-button";
 import { EditRegular } from "@fluentui/react-icons";
 import { getDocumentSetting } from "../../lib/settings-api/settings";
-import { Annotation } from "../../lib/annotation-api/types";
 import { useOfficeReady } from "./Setup";
 
 export const ViewAnnotationTypes = ({
-    setAnnotationType,
-}: {
+                                        setAnnotationType,
+                                    }: {
     setAnnotationType: Dispatch<SetStateAction<AnnotationType | null>>;
 }) => {
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
@@ -26,7 +25,8 @@ export const ViewAnnotationTypes = ({
     return (
         <div>
             <div className={"mb-2"}>Annotation Types:</div>
-            <Button onClick={() => setAnnotationType({ formDescription: [], name: "New Annotation Type" })}>
+            <Button onClick={() => setAnnotationType(
+                { formDescription: [], name: "New Annotation Type", exportData: {} } as AnnotationType)}>
                 Add Annotation Type
             </Button>
             <Accordion collapsible>

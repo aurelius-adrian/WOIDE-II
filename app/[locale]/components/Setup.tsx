@@ -37,7 +37,7 @@ export default function Setup({ children }: { children: any }) {
 
     const initOfficeJS = async () => {
         window.Office.onReady(() => {
-            console.log("WOIDE II initialized Office JS");
+            console.debug("WOIDE II initialized Office JS");
             setOfficeReady(true);
             window.history.replaceState = function () {};
         });

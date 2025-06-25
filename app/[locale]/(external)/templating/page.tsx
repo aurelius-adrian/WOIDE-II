@@ -24,6 +24,7 @@ export default function Test() {
     };
     const formRef = useRef<AnnotationFormApi>(null);
 
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const Mustache = require("mustache");
     const [exportLayers, setExportLayers] = useState<{
         [key: string]: string;
@@ -170,7 +171,6 @@ export default function Test() {
                             formDescription={data?.formDescription ?? []}
                             ref={formRef}
                             onChange={(v) => {
-                                console.log(v);
                                 _setFormData(v);
                             }}
                         />
@@ -185,9 +185,11 @@ export default function Test() {
                         <div className="my-2">Available Functions:</div>
                         <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
                             <code className="text-sm">
-                                {"getInnerHTML: Gets the HTML content within the annotation and evaluates all children with the same layer key returning the export result." +
+                                {"getInnerHTML: Gets the HTML content within the annotation and evaluates all " +
+                                    "children with the same layer key returning the export result." +
                                     "\n\n" +
-                                    "getChildrenEval: Evaluates all children with the same layer key returning the export result."}
+                                    "getChildrenEval: Evaluates all children with the same layer key " +
+                                    "returning the export result."}
                             </code>
                         </pre>
                     </div>

@@ -51,8 +51,10 @@ export default function TaskPanePage() {
                     icon={!edit ? <EditRegular /> : <EyeFilled />}
                     onClick={() => {
                         setEdit(!edit);
-                        annotationToEdit && removeHighlightAnnotationID(annotationToEdit.id);
-                        setannotationToEdit(null);
+                        if (annotationToEdit) {
+                            removeHighlightAnnotationID(annotationToEdit.id);
+                            setannotationToEdit(null);
+                        }
                     }}
                 >
                     {!edit ? "Add Annotation" : "View Annotations"}

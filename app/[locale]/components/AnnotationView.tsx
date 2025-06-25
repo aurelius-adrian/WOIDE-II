@@ -16,9 +16,9 @@ import { enqueueSnackbar } from "notistack";
 interface AnnotationViewProps {
     currentAnnotation: Annotation;
     currentAnnotationIndex: number;
-    updateAnnotations: Function;
-    setEditMode: Function;
-    setEditAnnotation: Function;
+    updateAnnotations: (a: Annotation[]) => void;
+    setEditMode: (v: boolean) => void;
+    setEditAnnotation: (a: Annotation | null) => void;
 }
 
 export const AnnotationView = ({
@@ -82,7 +82,7 @@ export const AnnotationView = ({
                                         e.target as EventTarget & {
                                             ariaPressed: string;
                                         }
-                                    ).ariaPressed == "false"
+                                    ).ariaPressed === "false"
                                 )
                                     highlightAnnotationID(currentAnnotation);
                                 else removeHighlightAnnotationID(currentAnnotation);

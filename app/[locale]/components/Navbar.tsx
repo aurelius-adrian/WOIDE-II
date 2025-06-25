@@ -32,7 +32,7 @@ const Navbar = () => {
                         }}
                     ></Button>
                 </div>
-                <div hidden={pathname.startsWith("/taskpane") || pathname == "/"}>
+                <div hidden={pathname.startsWith("/taskpane") || pathname === "/"}>
                     <Button
                         appearance="transparent"
                         icon={<HomeRegular className={"transition-all text-white"} />}
@@ -62,7 +62,8 @@ const Navbar = () => {
                         value={locale}
                         onChange={handleLanguageChange}
                         className={
-                            "text-white rounded-md py-2 bg-transparent focus:ring-0 focus:outline-none border-none appearance-none"
+                            "text-white rounded-md py-2 bg-transparent focus:ring-0 " +
+                            "focus:outline-none border-none appearance-none"
                         }
                     >
                         <option value="en">EN</option>

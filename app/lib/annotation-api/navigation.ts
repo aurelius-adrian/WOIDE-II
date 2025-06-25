@@ -11,7 +11,7 @@ export const highlightAnnotationID = async (a: Annotation | string) => {
         end.load("text");
         await context.sync();
 
-        if (start.items.length == 0) return;
+        if (start.items.length === 0) return;
 
         start.items[0].select();
         const aRange = _getAnnotationRange(start.items[0].getRange(), end.items[0].getRange());
@@ -29,7 +29,7 @@ export const removeHighlightAnnotationID = async (a: Annotation | string) => {
         end.load("text");
         await context.sync();
 
-        if (start.items.length == 0) return;
+        if (start.items.length === 0) return;
 
         start.items[0].select();
         const aRange = _getAnnotationRange(start.items[0].getRange(), end.items[0].getRange());
