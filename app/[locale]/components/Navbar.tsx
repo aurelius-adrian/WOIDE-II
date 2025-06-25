@@ -1,23 +1,20 @@
 "use client";
 import React from "react";
 import { Button } from "@fluentui/react-button";
-import { Select } from "@fluentui/react-select";
-import { useId } from "@fluentui/react-utilities";
 import { useDarkModeContext } from "./Setup";
 import { DarkThemeFilled, HomeRegular, SettingsRegular } from "@fluentui/react-icons";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import LanguageSelect from "./LanguageSelect";
 
 const Navbar = () => {
     const locale = useLocale();
     const { darkMode, setDarkMode } = useDarkModeContext();
-    const selectId = useId();
     const t = useTranslations("Navbar");
     const pathname = usePathname();
-    const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newLocale = e.target.value;
+    const handleLanguageChange = (e: string) => {
         const path = pathname.split("/").slice(2).join("/");
-        window.location.href = `/${newLocale}/${path}`;
+        window.location.href = `/${e}/${path}`;
     };
 
     return (
@@ -57,18 +54,7 @@ const Navbar = () => {
                     ></Button>
                 </div>
                 <div>
-                    <Select
-                        id={selectId}
-                        value={locale}
-                        onChange={handleLanguageChange}
-                        className={
-                            "text-white rounded-md py-2 bg-transparent focus:ring-0 " +
-                            "focus:outline-none border-none appearance-none"
-                        }
-                    >
-                        <option value="en">EN</option>
-                        <option value="de">DE</option>
-                    </Select>
+                    <LanguageSelect locale={locale} setLocale={handleLanguageChange} white={true} />
                 </div>
             </div>
         </div>
