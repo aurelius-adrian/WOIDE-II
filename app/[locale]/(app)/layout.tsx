@@ -11,9 +11,9 @@ export const metadata = {
 };
 
 export default async function RootLayout({
-                                             children,
-                                             params: asyncParams,
-                                         }: Readonly<{
+    children,
+    params: asyncParams,
+}: Readonly<{
     children: React.ReactNode;
     params: Promise<{ locale: string }>;
 }>) {
@@ -23,16 +23,16 @@ export default async function RootLayout({
     const messages = await getMessages();
     return (
         <html lang={locale}>
-        <body>
-        <NextIntlClientProvider messages={messages}>
-            <Setup>
-                <nav>
-                    <Navbar />
-                </nav>
-                {children}
-            </Setup>
-        </NextIntlClientProvider>
-        </body>
+            <body>
+                <NextIntlClientProvider messages={messages}>
+                    <Setup>
+                        <nav>
+                            <Navbar />
+                        </nav>
+                        {children}
+                    </Setup>
+                </NextIntlClientProvider>
+            </body>
         </html>
     );
 }

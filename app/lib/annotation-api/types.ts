@@ -3,8 +3,8 @@ export type Annotation = {
 } & AnnotationProperties;
 
 export type AnnotationProperties = {
-    color?: string | undefined,
-    startSymbol?: string | undefined,
-    endSymbol?: string | undefined,
-    data?: string | undefined,
-}
+    color?: string | undefined;
+    startSymbol?: string | undefined;
+    endSymbol?: string | undefined;
+    data?: string | undefined;
+};

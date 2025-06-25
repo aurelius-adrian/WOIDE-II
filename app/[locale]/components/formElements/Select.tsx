@@ -5,40 +5,40 @@ import { FormElementDescription } from "../Form";
 import { ImportantFieldIndicator } from "./ImportantFieldIndicator";
 
 export type SelectProps = {
-  description: FormElementDescription;
+    description: FormElementDescription;
 };
 
 export const Select = ({ description }: SelectProps) => {
-  const id = useId();
-  const { control } = useFormContext();
+    const id = useId();
+    const { control } = useFormContext();
 
-  return (
-    <div>
-      <Controller
-        control={control}
-        name={description.id}
-        rules={{
-          required: description.required ?? false,
-        }}
-        render={({ field }) => (
-          <div className={"flex flex-col gap-0.5"}>
-            <Label htmlFor={id} disabled={field.disabled}>
-              {description.label}
-              {description.required && <ImportantFieldIndicator />}
-            </Label>
-            <SelectComponent id={id} {...field}>
-              {description.options &&
-                description.options.map((e, idx) => (
-                  <option key={idx} value={e.value}>
-                    {e.label}
-                  </option>
-                ))}
-            </SelectComponent>
-          </div>
-        )}
-      />
-    </div>
-  );
+    return (
+        <div>
+            <Controller
+                control={control}
+                name={description.id}
+                rules={{
+                    required: description.required ?? false,
+                }}
+                render={({ field }) => (
+                    <div className={"flex flex-col gap-0.5"}>
+                        <Label htmlFor={id} disabled={field.disabled}>
+                            {description.label}
+                            {description.required && <ImportantFieldIndicator />}
+                        </Label>
+                        <SelectComponent id={id} {...field}>
+                            {description.options &&
+                                description.options.map((e, idx) => (
+                                    <option key={idx} value={e.value}>
+                                        {e.label}
+                                    </option>
+                                ))}
+                        </SelectComponent>
+                    </div>
+                )}
+            />
+        </div>
+    );
 };
 
 export default Select;

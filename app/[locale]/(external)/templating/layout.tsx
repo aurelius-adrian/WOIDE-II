@@ -10,26 +10,23 @@ export const metadata = {
 };
 
 export default async function RootLayout({
-                                             children,
-                                             params: asyncParams,
-                                         }: Readonly<{
+    children,
+    params: asyncParams,
+}: Readonly<{
     children: React.ReactNode;
     params: Promise<{ locale: string }>;
 }>) {
-
     const messages = await getMessages();
     const params = await asyncParams;
     const { locale } = params;
 
     return (
         <html lang={locale}>
-        <body>
-        <NextIntlClientProvider messages={messages}>
-            <Setup>
-                {children}
-            </Setup>
-        </NextIntlClientProvider>
-        </body>
+            <body>
+                <NextIntlClientProvider messages={messages}>
+                    <Setup>{children}</Setup>
+                </NextIntlClientProvider>
+            </body>
         </html>
     );
 }

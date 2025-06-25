@@ -1,16 +1,16 @@
-import {v4} from "uuid"
-import {Annotation, AnnotationProperties} from "./types";
+import { v4 } from "uuid";
+import { Annotation, AnnotationProperties } from "./types";
 
-export const idSalt = "woideann_"
+export const idSalt = "woideann_";
 
 const _randomHexColor = () => {
-    const hexChars = '0123456789ABCDEF';
-    let color = '#';
+    const hexChars = "0123456789ABCDEF";
+    let color = "#";
     for (let i = 0; i < 6; i++) {
         color += hexChars[Math.floor(Math.random() * 16)];
     }
     return color;
-}
+};
 
 export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () => {
     return await Word.run(async (context) => {
@@ -18,41 +18,47 @@ export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () =
         const ccs = selection.contentControls;
         ccs.load();
         await context.sync();
-        const list = selection.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
-        return list.map(e => {
+        const list = selection.contentControls.items.filter(
+            (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
+        );
+        return list.map((e) => {
             return {
                 id: e.tag.slice(idSalt.length + 2),
                 data: e.title,
                 color: e.color,
             } as Annotation;
-        })
+        });
     });
-}
+};
 
 export const getAnnotations: () => Promise<Annotation[]> = async () => {
     return await Word.run(async (context) => {
         const ccs = context.document.contentControls;
         ccs.load();
         await context.sync();
-        const list = context.document.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
-        return list.map(e => {
+        const list = context.document.contentControls.items.filter(
+            (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
+        );
+        return list.map((e) => {
             return {
                 id: e.tag.slice(idSalt.length + 2),
                 data: e.title,
                 color: e.color,
             } as Annotation;
-        })
+        });
     });
-}
+};
 
 export const getAnnotationContentControls = async () => {
     return await Word.run(async (context) => {
         const ccs = context.document.contentControls;
         ccs.load();
         await context.sync();
-        return context.document.contentControls.items.filter(e => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
+        return context.document.contentControls.items.filter(
+            (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
+        );
     });
-}
+};
 
 export const insertAnnotation = async (props: AnnotationProperties = {}): Promise<Annotation | null> => {
     let ret = null;
@@ -65,7 +71,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         const end: Word.Range = range.getRange(Word.RangeLocation.end);
 
         ret = {
-          id: v4(),
+            id: v4(),
         };
 
         const color = props.color ?? _randomHexColor();
@@ -73,10 +79,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         const endSymbol = props.endSymbol ?? "❬";
 
         start.insertText(" ", Word.InsertLocation.after);
-        const startSymbolRange = start.insertText(
-          startSymbol,
-          Word.InsertLocation.replace
-        );
+        const startSymbolRange = start.insertText(startSymbol, Word.InsertLocation.replace);
         const cc_s = startSymbolRange.insertContentControl();
         cc_s.appearance = Word.ContentControlAppearance.hidden;
         cc_s.tag = idSalt + "_s" + ret.id;
@@ -86,10 +89,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         cc_s.cannotEdit = true;
 
         end.insertText(" ", Word.InsertLocation.before);
-        const endSymbolRange = end.insertText(
-          endSymbol,
-          Word.InsertLocation.replace
-        );
+        const endSymbolRange = end.insertText(endSymbol, Word.InsertLocation.replace);
         const cc_e = endSymbolRange.insertContentControl();
         cc_e.cannotEdit = false;
         cc_e.appearance = Word.ContentControlAppearance.hidden;
@@ -103,27 +103,26 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
     });
 
     return ret;
-}
-export const updateAnnotation = async (AnnotationToUpdateID: string,props: AnnotationProperties = {}): Promise<void> => {
-
+};
+export const updateAnnotation = async (
+    AnnotationToUpdateID: string,
+    props: AnnotationProperties = {},
+): Promise<void> => {
     await Word.run(async (context) => {
         const contentControls = context.document.contentControls;
         contentControls.load();
         await context.sync();
-    
-        const toUpdate = contentControls.items.filter(cc => 
-          cc.tag === `${idSalt}_s${AnnotationToUpdateID}` 
-        );
+
+        const toUpdate = contentControls.items.filter((cc) => cc.tag === `${idSalt}_s${AnnotationToUpdateID}`);
         toUpdate[0].cannotEdit = false;
         toUpdate[0].title = props.data ?? "";
         await context.sync();
-        
-      });
-}
+    });
+};
 
 export const _getAnnotationRange = (start: Word.Range, end: Word.Range): Word.Range => {
     return start.expandTo(end);
-}
+};
 
 export const deleteAnnotation = async (annotationId: string): Promise<void> => {
     await Word.run(async (context) => {
@@ -131,12 +130,8 @@ export const deleteAnnotation = async (annotationId: string): Promise<void> => {
         contentControls.load();
         await context.sync();
 
-        const startCC = contentControls.items.find(
-            (cc) => cc.tag === `${idSalt}_s${annotationId}`
-        );
-        const endCC = contentControls.items.find(
-            (cc) => cc.tag === `${idSalt}_e${annotationId}`
-        );
+        const startCC = contentControls.items.find((cc) => cc.tag === `${idSalt}_s${annotationId}`);
+        const endCC = contentControls.items.find((cc) => cc.tag === `${idSalt}_e${annotationId}`);
 
         if (!startCC || !endCC) return;
 

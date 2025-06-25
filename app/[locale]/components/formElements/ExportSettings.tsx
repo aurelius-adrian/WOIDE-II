@@ -1,8 +1,7 @@
-import {FormElementDescription} from "../Form";
-
+import { FormElementDescription } from "../Form";
 
 export type ExportSettingsData = null;
 
 interface ExportSettingsProps {
-    description: FormElementDescription
+    description: FormElementDescription;
 }
