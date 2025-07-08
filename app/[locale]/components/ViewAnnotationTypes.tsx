@@ -220,9 +220,6 @@ export const ViewAnnotationTypes = ({
                 >
                     Add
                 </Button>
-                {/* <Button onClick={handleUploadClick}>Import from JSON</Button>
-                <Button onClick={handleExportClick}>Export to JSON</Button> */}
-
                 <Button icon={<ArrowUploadFilled />} onClick={handleUploadClick} aria-label="Import from JSON">
                     Import
                 </Button>
