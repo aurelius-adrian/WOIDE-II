@@ -2,9 +2,8 @@ import { AnnotationType } from "../../lib/utils/annotations";
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "@fluentui/react-button";
-import { AddFilled, EditRegular } from "@fluentui/react-icons";
+import { AddFilled, EditRegular, ArrowUploadFilled, ArrowDownloadFilled } from "@fluentui/react-icons";
 import { getDocumentSetting, setDocumentSetting } from "../../lib/settings-api/settings";
-import { ArrowUploadFilled, ArrowDownloadFilled } from "@fluentui/react-icons";
 import { useOfficeReady } from "./Setup";
 import { v4 } from "uuid";
 import {
