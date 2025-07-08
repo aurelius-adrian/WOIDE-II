@@ -39,6 +39,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
         if (officeReady) _getData();
     }, [officeReady, setAnnotationTypes]);
+
     useEffect(() => {
         if (editAnnotation) {
             const filterdData = Object.fromEntries(
@@ -68,6 +69,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const addAnnotation = async () => {
         try {
             const data = await formRef.current?.submit();
+
             if (!data) {
                 enqueueSnackbar({
                     message: "Complete the form to add annotation type.",
@@ -76,7 +78,12 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 });
                 return;
             }
-            const annotationDetailedData = { ...data, ...selectedAnnotationType };
+
+            const annotationDetailedData = {
+                ...data,
+                ...selectedAnnotationType,
+                annotationTypeId: selectedAnnotationType?.id,
+            };
 
             await insertAnnotation({
                 data: JSON.stringify(annotationDetailedData),
@@ -96,6 +103,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             });
         }
     };
+
     const updateAnnotationData = async () => {
         try {
             const data = await formRef.current?.submit();
@@ -107,7 +115,12 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 });
                 return;
             }
-            const annotationDetailedData = { ...data, ...selectedAnnotationType };
+
+            const annotationDetailedData = {
+                ...data,
+                ...selectedAnnotationType,
+                annotationTypeId: selectedAnnotationType?.id,
+            };
 
             await updateAnnotation(editAnnotation?.id ?? "", {
                 data: JSON.stringify(annotationDetailedData),
@@ -130,6 +143,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             });
         }
     };
+
     return (
         <div>
             <label htmlFor={selectId}>Annotation Type</label>

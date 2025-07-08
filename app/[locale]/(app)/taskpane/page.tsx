@@ -9,23 +9,26 @@ import AnnotationEditor from "../../components/AnnotationEditor";
 import { useTranslations } from "next-intl";
 import AnnotationView from "../../components/AnnotationView";
 import { highlightAnnotationID, removeHighlightAnnotationID } from "../../../lib/annotation-api/navigation";
+import { useOfficeReady } from "../../components/Setup";
 
 export default function TaskPanePage() {
     const t = useTranslations("TaskPane");
 
+    const officeReady = useOfficeReady();
     const [edit, setEdit] = useState<boolean>(true);
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
     const [annotationToEdit, setannotationToEdit] = useState<Annotation | null>(null);
 
     useEffect(() => {
-        if (edit) _getAnnotations();
-    }, [edit, annotations.length]);
+        if (edit && officeReady) _getAnnotations();
+    }, [edit, annotations.length, officeReady]);
 
     useEffect(() => {
         if (annotationToEdit) {
             highlightAnnotationID(annotationToEdit?.id);
         }
     }, [annotationToEdit]);
+
     const _getAnnotations = async () => {
         getAnnotations().then(setAnnotations);
     };

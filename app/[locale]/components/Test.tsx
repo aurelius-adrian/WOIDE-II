@@ -32,11 +32,16 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     };
 
     const test_3 = async () => {
-        dialog.current?.messageChild("Test!!!! Woaaa");
+        Word.run(async (context) => {
+            const ccs = context.document.body.contentControls;
+            ccs.load();
+            await context.sync();
+            console.log(ccs.items);
+        });
     };
 
     const test_4 = async () => {
-        Export();
+        Export("default");
     };
 
     function processMessage(arg: any) {

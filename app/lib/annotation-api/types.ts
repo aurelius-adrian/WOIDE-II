@@ -1,5 +1,6 @@
 export type Annotation = {
     id: string;
+    annotationTypeId: string;
 } & AnnotationProperties;
 
 export type AnnotationProperties = {
