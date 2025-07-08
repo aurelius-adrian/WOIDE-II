@@ -1,3 +1,5 @@
+let lazyData: Record<string, any> = {};
+
 /**
  * Saves data in Word document settings.
  * @param key - The settings key
@@ -13,6 +15,7 @@ export async function setDocumentSetting<T>(key: string, value: T): Promise<void
             const settings = context.document.settings;
             settings.add(key, JSON.stringify(value));
             await context.sync();
+            lazyData[key] = value;
         });
     } catch (error) {
         throw new Error(`Failed to save setting: ${(error as Error).message}`);
@@ -29,6 +32,10 @@ export async function getDocumentSetting<T>(key: string): Promise<T | null> {
         throw new Error("Word API is not available. Run this inside Microsoft Word.");
     }
 
+    if (lazyData[key]) {
+        return lazyData[key];
+    }
+
     try {
         return await Word.run(async (context) => {
             const settings = context.document.settings;
@@ -36,7 +43,9 @@ export async function getDocumentSetting<T>(key: string): Promise<T | null> {
             setting.load("value");
             await context.sync();
 
-            return setting.isNullObject ? null : JSON.parse(setting.value);
+            const value = setting.isNullObject ? null : JSON.parse(setting.value);
+            lazyData[key] = value;
+            return value;
         });
     } catch (error) {
         throw new Error(`Failed to retrieve setting: ${(error as Error).message}`);
