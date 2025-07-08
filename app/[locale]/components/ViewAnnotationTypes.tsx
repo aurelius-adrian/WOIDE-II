@@ -2,8 +2,9 @@ import { AnnotationType } from "../../lib/utils/annotations";
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "@fluentui/react-button";
-import { EditRegular } from "@fluentui/react-icons";
+import { AddFilled, EditRegular } from "@fluentui/react-icons";
 import { getDocumentSetting, setDocumentSetting } from "../../lib/settings-api/settings";
+import { ArrowUploadFilled, ArrowDownloadFilled } from "@fluentui/react-icons";
 import { useOfficeReady } from "./Setup";
 import { v4 } from "uuid";
 import {
@@ -172,11 +173,44 @@ export const ViewAnnotationTypes = ({
             });
         }
     };
+    const handleExportClick = () => {
+        if (annotationTypes.length === 0) {
+            enqueueSnackbar({
+                message: "No annotation types to export",
+                variant: "warning",
+                autoHideDuration: 2500,
+            });
+            return;
+        }
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `export-annotations-${timestamp}.json`;
+        const data = {
+            annotationTypes: annotationTypes,
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        enqueueSnackbar({
+            message: `Exported ${annotationTypes.length} annotation types to ${filename}`,
+            variant: "success",
+            autoHideDuration: 2500,
+        });
+    };
     return (
         <div>
             <div className={"mb-2"}>Annotation Types:</div>
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 justify-between">
                 <Button
+                    icon={<AddFilled />}
                     onClick={() =>
                         setAnnotationType({
                             formDescription: [],
@@ -185,9 +219,18 @@ export const ViewAnnotationTypes = ({
                         } as AnnotationType)
                     }
                 >
-                    Add Annotation Type
+                    Add
                 </Button>
-                <Button onClick={handleUploadClick}>Import from JSON</Button>
+                {/* <Button onClick={handleUploadClick}>Import from JSON</Button>
+                <Button onClick={handleExportClick}>Export to JSON</Button> */}
+
+                <Button icon={<ArrowUploadFilled />} onClick={handleUploadClick} aria-label="Import from JSON">
+                    Import
+                </Button>
+                <Button icon={<ArrowDownloadFilled />} onClick={handleExportClick} aria-label="Export to JSON">
+                    Export
+                </Button>
+
                 <input
                     type="file"
                     accept=".json"
