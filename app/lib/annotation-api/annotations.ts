@@ -36,9 +36,7 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
         const ccs = context.document.contentControls;
         ccs.load();
         await context.sync();
-        const list = context.document.contentControls.items.filter(
-            (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
-        );
+        const list = ccs.items.filter((e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
         return list.map((e) => {
             return {
                 id: e.tag.slice(idSalt.length + 2),
@@ -49,15 +47,20 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
     });
 };
 
-export const getAnnotationContentControls = async () => {
+export const getAnnotationContentControls = async (range?: Word.Range): Promise<Word.ContentControl[]> => {
     return await Word.run(async (context) => {
-        const ccs = context.document.contentControls;
-        ccs.load();
-        await context.sync();
-        return context.document.contentControls.items.filter(
-            (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
-        );
+        return await _getAnnotationContentControls(context, range);
     });
+};
+
+export const _getAnnotationContentControls = async (
+    context: Word.RequestContext,
+    range?: Word.Range,
+): Promise<Word.ContentControl[]> => {
+    const ccs = range?.contentControls || context.document.contentControls;
+    ccs.load("items");
+    await context.sync();
+    return ccs.items.filter((e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
 };
 
 export const insertAnnotation = async (props: AnnotationProperties = {}): Promise<Annotation | null> => {
@@ -104,6 +107,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
 
     return ret;
 };
+
 export const updateAnnotation = async (
     AnnotationToUpdateID: string,
     props: AnnotationProperties = {},

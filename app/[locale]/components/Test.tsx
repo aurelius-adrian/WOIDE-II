@@ -3,7 +3,7 @@ import { insertAnnotation } from "../../lib/annotation-api/annotations";
 import { highlightAnnotationID } from "../../lib/annotation-api/navigation";
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
-import { AnnotationType } from "../../lib/utils/annotations";
+import { Export } from "../../lib/export-api/export";
 
 const Test = () => {
     const dialog = useRef<Office.Dialog>();
@@ -36,53 +36,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     };
 
     const test_4 = async () => {
-        const data: AnnotationType = {
-            id: "123-456-7890",
-            name: "Test",
-            formDescription: [
-                {
-                    id: "first",
-                    type: "textInput",
-                    label: "First Field",
-                },
-                {
-                    id: "second",
-                    type: "textInput",
-                    label: "Second Field",
-                },
-                {
-                    id: "third",
-                    type: "select",
-                    label: "Third Field",
-                    options: [
-                        {
-                            value: "value 1",
-                            label: "Value 1",
-                        },
-                        {
-                            value: "value 2",
-                            label: "Value 2",
-                        },
-                    ],
-                },
-            ],
-            exportData: {},
-            description: "Test Annotation Type",
-        };
-
-        Office.context.ui.displayDialogAsync(
-            `https://localhost:3050/templating?data=${btoa(JSON.stringify(data))}`,
-            {
-                height: 80,
-                width: 80,
-                displayInIframe: false,
-            },
-            (res) => {
-                dialog.current = res.value;
-                dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
-                dialog.current?.messageChild("Test!!!! Woaaa");
-            },
-        );
+        Export();
     };
 
     function processMessage(arg: any) {
