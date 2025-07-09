@@ -156,7 +156,7 @@ async function helper(
 
     ret = ret.concat(Mustache.render(template, data));
 
-    const eRange = aRange.getRange(Word.RangeLocation.after).expandTo(range.getRange(Word.RangeLocation.end));
+    const eRange = annotation.end.getRange(Word.RangeLocation.after).expandTo(range.getRange(Word.RangeLocation.end));
     ret = ret.concat(await helper(eRange, layer, context, withoutHTML));
 
     return ret;
