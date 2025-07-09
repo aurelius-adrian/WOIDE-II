@@ -1,3 +1,5 @@
+import { AnnotationType } from "../utils/annotations";
+
 let lazyData: Record<string, any> = {};
 
 /**
@@ -82,3 +84,17 @@ export async function getAllDocumentSettings(): Promise<Record<string, any>> {
         throw new Error(`Failed to retrieve all settings: ${(error as Error).message}`);
     }
 }
+
+export const getAllExportLayers = async (): Promise<string[]> => {
+    const ret: Set<string> = new Set<string>();
+
+    (await getDocumentSetting<AnnotationType[]>("annotationTypes"))?.forEach((e) => {
+        if (e.exportData) {
+            Object.keys(e.exportData).forEach((e) => {
+                ret.add(e);
+            });
+        }
+    });
+
+    return [...ret];
+};

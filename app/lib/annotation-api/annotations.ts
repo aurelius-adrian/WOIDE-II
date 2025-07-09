@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
+import { getDocumentSetting } from "../settings-api/settings";
 
 export const idSalt = "woideann_";
 

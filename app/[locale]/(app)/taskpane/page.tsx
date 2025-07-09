@@ -10,6 +10,10 @@ import { useTranslations } from "next-intl";
 import AnnotationView from "../../components/AnnotationView";
 import { highlightAnnotationID, removeHighlightAnnotationID } from "../../../lib/annotation-api/navigation";
 import { useOfficeReady } from "../../components/Setup";
+import { Select } from "@fluentui/react-select";
+import { useId } from "@fluentui/react-utilities";
+import { getAllExportLayers } from "../../../lib/settings-api/settings";
+import { Export } from "../../../lib/export-api/export";
 
 export default function TaskPanePage() {
     const t = useTranslations("TaskPane");
@@ -18,6 +22,20 @@ export default function TaskPanePage() {
     const [edit, setEdit] = useState<boolean>(true);
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
     const [annotationToEdit, setannotationToEdit] = useState<Annotation | null>(null);
+    const [exportLoading, setExportLoading] = useState<boolean>(false);
+
+    const select2Id = useId();
+
+    const [exportLayers, setExportLayers] = useState<string[]>([]);
+    const [selectedExportLayer, setSelectedExportLayer] = useState<string>("default");
+
+    useEffect(() => {
+        const _getData = async () => {
+            setExportLayers(await getAllExportLayers());
+        };
+
+        if (officeReady) _getData();
+    }, [officeReady]);
 
     useEffect(() => {
         if (edit && officeReady) _getAnnotations();
@@ -71,6 +89,36 @@ export default function TaskPanePage() {
                 />
             ) : (
                 <div className={"flex flex-col space-y-2"}>
+                    <div className={"mb-4"}>
+                        <label htmlFor={select2Id}>Export document for &#34;{selectedExportLayer}&#34; layer</label>
+                        <Select
+                            value={selectedExportLayer}
+                            id={select2Id}
+                            className={"mb-2"}
+                            onChange={(e) => {
+                                setSelectedExportLayer(e.target.value);
+                            }}
+                        >
+                            {exportLayers.map((e, idx) => (
+                                <option key={idx} value={e}>
+                                    {e}
+                                </option>
+                            ))}
+                        </Select>
+                        <Button
+                            disabled={exportLoading}
+                            onClick={async () => {
+                                setExportLoading(true);
+                                try {
+                                    await Export("default");
+                                } finally {
+                                    setExportLoading(false);
+                                }
+                            }}
+                        >
+                            Export
+                        </Button>
+                    </div>
                     {annotations.map((a, i) => (
                         <AnnotationView
                             key={i}
