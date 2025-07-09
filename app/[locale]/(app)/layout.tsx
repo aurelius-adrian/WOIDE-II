@@ -29,7 +29,7 @@ export default async function RootLayout({
                         <nav>
                             <Navbar />
                         </nav>
-                        {children}
+                        <div className="p-4">{children}</div>
                     </Setup>
                 </NextIntlClientProvider>
             </body>
