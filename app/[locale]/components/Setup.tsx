@@ -77,7 +77,7 @@ export default function Setup({ children }: { children: any }) {
                 <SnackbarProvider>
                     <OfficeReadyContext.Provider value={officeReady}>
                         <FluentProvider theme={theme} className={"h-full"}>
-                            <main className={"bg-light-bg dark:bg-dark-bg h-full"}>{children}</main>
+                            <main className={"bg-light-bg dark:bg-dark-bg"}>{children}</main>
                         </FluentProvider>
                     </OfficeReadyContext.Provider>
                 </SnackbarProvider>

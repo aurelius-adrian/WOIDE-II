@@ -7,7 +7,7 @@ export default function Main() {
     const t = useTranslations("Home");
 
     return (
-        <div className={"mt-10"}>
+        <div className={"py-10"}>
             <Markdown>{t("article")}</Markdown>
         </div>
     );

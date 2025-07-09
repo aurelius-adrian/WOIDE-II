@@ -22,14 +22,14 @@ export default async function RootLayout({
 
     const messages = await getMessages();
     return (
-        <html lang={locale}>
+        <html lang={locale} className={"h-full bg-light-bg dark:bg-dark-bg"}>
             <body>
                 <NextIntlClientProvider messages={messages}>
                     <Setup>
                         <nav>
                             <Navbar />
                         </nav>
-                        {children}
+                        <div className="p-4">{children}</div>
                     </Setup>
                 </NextIntlClientProvider>
             </body>

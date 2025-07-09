@@ -20,7 +20,7 @@ const Navbar = () => {
     return (
         <div className="relative bg-blue-950 h-12">
             <div className="h-full flex items-center px-3 justify-between">
-                <div hidden={pathname.startsWith("/settings")}>
+                <div hidden={pathname.endsWith("/settings")}>
                     <Button
                         appearance="transparent"
                         icon={<SettingsRegular className={"transition-all text-white hover:rotate-45"} />}
@@ -29,7 +29,7 @@ const Navbar = () => {
                         }}
                     ></Button>
                 </div>
-                <div hidden={pathname.startsWith("/taskpane") || pathname === "/"}>
+                <div hidden={pathname.endsWith("/taskpane")}>
                     <Button
                         appearance="transparent"
                         icon={<HomeRegular className={"transition-all text-white"} />}
@@ -39,7 +39,7 @@ const Navbar = () => {
                     ></Button>
                 </div>
 
-                <div>
+                <div className={"flex flex-row space-x-2"}>
                     <Button
                         appearance="transparent"
                         icon={
@@ -52,8 +52,6 @@ const Navbar = () => {
                         color="white"
                         onClick={() => setDarkMode(!darkMode)}
                     ></Button>
-                </div>
-                <div>
                     <LanguageSelect locale={locale} setLocale={handleLanguageChange} white={true} />
                 </div>
             </div>
