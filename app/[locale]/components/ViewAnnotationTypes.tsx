@@ -2,7 +2,7 @@ import { AnnotationType } from "../../lib/utils/annotations";
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "@fluentui/react-button";
-import { AddFilled, EditRegular, ArrowUploadFilled, ArrowDownloadFilled } from "@fluentui/react-icons";
+import { AddFilled, ArrowDownloadFilled, ArrowUploadFilled, EditRegular } from "@fluentui/react-icons";
 import { getDocumentSetting, setDocumentSetting } from "../../lib/settings-api/settings";
 import { useOfficeReady } from "./Setup";
 import { v4 } from "uuid";
@@ -18,6 +18,7 @@ import {
 } from "@fluentui/react-components";
 import { validateAnnotationTypes } from "./utils/AnnotationTypeValidation";
 import { enqueueSnackbar } from "notistack";
+
 type ImportResolution = {
     [name: string]: "replace" | "skip";
 };
@@ -37,20 +38,66 @@ export const ViewAnnotationTypes = ({
         fileInputRef.current?.click();
     };
 
+    const dialog = useRef<Office.Dialog>();
+    const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>();
+
     useEffect(() => {
         const _getData = async () => {
             setAnnotationTypes(((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[]);
+            setExportData(
+                ((await getDocumentSetting("documentExportSettings")) ?? { default: "{{{getInnerHTML}}}" }) as {
+                    [key: string]: string;
+                },
+            );
         };
 
         if (officeReady) _getData();
-        const loadAnnotationTypes = async () => {
-            if (officeReady) {
-                const types = (await getDocumentSetting("annotationTypes")) as AnnotationType[] | null;
-                setAnnotationTypes(types || []);
-            }
-        };
-        loadAnnotationTypes();
     }, [officeReady, setAnnotationTypes]);
+
+    const openDialog = () => {
+        const url = new URL("/templating", window.origin);
+        url.searchParams.append(
+            "data",
+            btoa(
+                JSON.stringify({
+                    formDescription: [],
+                    exportData,
+                }),
+            ),
+        );
+
+        Office.context.ui.displayDialogAsync(
+            url.href,
+            {
+                height: 80,
+                width: 80,
+                displayInIframe: false,
+            },
+            (res) => {
+                dialog.current = res.value;
+                dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+            },
+        );
+    };
+
+    async function processMessage(arg: any) {
+        try {
+            const data = JSON.parse(arg.message);
+            await setDocumentSetting("documentExportSettings", data);
+            setExportData(data);
+        } catch (e) {
+            console.error("could not parse/save export template data: ", e);
+            dialog.current?.messageChild("error");
+            return;
+        }
+        dialog.current?.messageChild("success");
+        enqueueSnackbar({
+            message: "Saved Document Export Settings.",
+            variant: "success",
+            autoHideDuration: 2000,
+        });
+    }
+
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
         if (!selectedFile) return;
@@ -172,6 +219,7 @@ export const ViewAnnotationTypes = ({
             });
         }
     };
+
     const handleExportClick = () => {
         if (annotationTypes.length === 0) {
             enqueueSnackbar({
@@ -204,8 +252,14 @@ export const ViewAnnotationTypes = ({
             autoHideDuration: 2500,
         });
     };
+
     return (
         <div>
+            <div className={"mb-2"}>Document Export Settings:</div>
+            <div className={"mb-4"}>
+                <Button onClick={openDialog}>Edit Export Settings</Button>
+            </div>
+
             <div className={"mb-2"}>Annotation Types:</div>
             <div className="flex gap-2 mb-4 justify-between">
                 <Button
