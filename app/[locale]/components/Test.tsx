@@ -3,7 +3,7 @@ import { insertAnnotation } from "../../lib/annotation-api/annotations";
 import { highlightAnnotationID } from "../../lib/annotation-api/navigation";
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
-import { Export } from "../../lib/export-api/export";
+import { Export, saveStringToFile } from "../../lib/export-api/export";
 
 const Test = () => {
     const dialog = useRef<Office.Dialog>();
@@ -41,7 +41,11 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     };
 
     const test_4 = async () => {
-        Export("default");
+        Word.run(async (context) => {
+            const html = context.document.body.getRange().getHtml();
+            await context.sync();
+            saveStringToFile(html.value, "test.html", "text/html");
+        });
     };
 
     function processMessage(arg: any) {

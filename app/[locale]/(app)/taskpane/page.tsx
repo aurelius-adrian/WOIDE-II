@@ -13,7 +13,7 @@ import { useOfficeReady } from "../../components/Setup";
 import { Select } from "@fluentui/react-select";
 import { useId } from "@fluentui/react-utilities";
 import { getAllExportLayers } from "../../../lib/settings-api/settings";
-import { Export } from "../../../lib/export-api/export";
+import { Export, getTimestamp, saveStringToFile } from "../../../lib/export-api/export";
 
 export default function TaskPanePage() {
     const t = useTranslations("TaskPane");
@@ -110,7 +110,11 @@ export default function TaskPanePage() {
                             onClick={async () => {
                                 setExportLoading(true);
                                 try {
-                                    await Export("default");
+                                    saveStringToFile(
+                                        await Export("default"),
+                                        `${selectedExportLayer}-${getTimestamp()}.html`,
+                                        "text/html",
+                                    );
                                 } finally {
                                     setExportLoading(false);
                                 }
