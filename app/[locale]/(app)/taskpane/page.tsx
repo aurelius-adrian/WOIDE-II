@@ -111,7 +111,7 @@ export default function TaskPanePage() {
                                 setExportLoading(true);
                                 try {
                                     saveStringToFile(
-                                        await Export("default"),
+                                        await Export(selectedExportLayer),
                                         `${selectedExportLayer}-${getTimestamp()}.html`,
                                         "text/html",
                                     );
