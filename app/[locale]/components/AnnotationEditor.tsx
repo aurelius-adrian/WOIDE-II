@@ -166,7 +166,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             ) : (
                 <>
                     <Button onClick={addAnnotation}>Add Annotation</Button>
-                    <Test />
+                    {process.env.NEXT_PUBLIC_DEV === "true" ? <Test /> : null}
                 </>
             )}
         </div>
