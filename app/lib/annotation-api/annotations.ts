@@ -1,6 +1,6 @@
+// annotations.ts - Enhanced with range update functionality
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
-import { getDocumentSetting } from "../settings-api/settings";
 
 export const idSalt = "woideann_";
 
@@ -121,6 +121,83 @@ export const updateAnnotation = async (
         const toUpdate = contentControls.items.filter((cc) => cc.tag === `${idSalt}_s${AnnotationToUpdateID}`);
         toUpdate[0].cannotEdit = false;
         toUpdate[0].title = props.data ?? "";
+        await context.sync();
+    });
+};
+
+export const updateAnnotationRange = async (annotationId: string, props: AnnotationProperties = {}): Promise<void> => {
+    await Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        selection.load("text");
+        await context.sync();
+
+        if (!selection.text || selection.text.trim() === "") {
+            throw new Error("Please select text before updating annotation range");
+        }
+
+        const contentControls = context.document.contentControls;
+        contentControls.load("tag, title, font/color, cannotEdit");
+        await context.sync();
+
+        const startTag = `${idSalt}_s${annotationId}`;
+        const endTag = `${idSalt}_e${annotationId}`;
+
+        const startCC = contentControls.items.find((cc) => cc.tag === startTag);
+        const endCC = contentControls.items.find((cc) => cc.tag === endTag);
+
+        if (!startCC || !endCC) {
+            console.error(
+                "Available tags:",
+                contentControls.items.map((cc) => cc.tag),
+            );
+            console.error("Looking for:", startTag, endTag);
+            throw new Error("Annotation not found.");
+        }
+
+        startCC.load("title, font/color");
+        endCC.load("font/color");
+        await context.sync();
+
+        const existingData = startCC.title;
+        const existingColor = startCC.font.color;
+
+        const splitRanges = selection.getRange().split([], true, false, true);
+        const newRange = splitRanges.getFirst();
+        const newStart: Word.Range = newRange.getRange(Word.RangeLocation.start);
+        const newEnd: Word.Range = newRange.getRange(Word.RangeLocation.end);
+
+        startCC.cannotEdit = false;
+        endCC.cannotEdit = false;
+        await context.sync();
+
+        startCC.delete(false);
+        endCC.delete(false);
+        await context.sync();
+
+        const color = existingColor;
+        const startSymbol = props.startSymbol ?? "❭";
+        const endSymbol = props.endSymbol ?? "❬";
+
+        newStart.insertText(" ", Word.InsertLocation.after);
+        const startSymbolRange = newStart.insertText(startSymbol, Word.InsertLocation.replace);
+        const new_cc_s = startSymbolRange.insertContentControl();
+        new_cc_s.appearance = Word.ContentControlAppearance.hidden;
+        new_cc_s.tag = startTag;
+        new_cc_s.title = existingData;
+        new_cc_s.font.color = color;
+        new_cc_s.font.bold = true;
+        new_cc_s.cannotEdit = true;
+
+        newEnd.insertText(" ", Word.InsertLocation.before);
+        const endSymbolRange = newEnd.insertText(endSymbol, Word.InsertLocation.replace);
+        const new_cc_e = endSymbolRange.insertContentControl();
+        new_cc_e.appearance = Word.ContentControlAppearance.hidden;
+        new_cc_e.tag = endTag;
+        new_cc_e.font.color = color;
+        new_cc_e.font.bold = true;
+        new_cc_e.cannotEdit = true;
+
+        newStart.select(Word.SelectionMode.start);
         await context.sync();
     });
 };
