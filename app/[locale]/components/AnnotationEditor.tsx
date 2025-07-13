@@ -1,4 +1,3 @@
-// AnnotationEditor.tsx - Enhanced with range update functionality
 "use client";
 import { Select } from "@fluentui/react-select";
 import { Button } from "@fluentui/react-button";

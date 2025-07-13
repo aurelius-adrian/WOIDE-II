@@ -1,4 +1,3 @@
-// annotations.ts - Enhanced with range update functionality
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
 
