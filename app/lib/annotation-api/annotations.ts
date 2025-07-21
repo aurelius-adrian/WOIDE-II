@@ -31,11 +31,6 @@ export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () =
     });
 };
 
-export const checkColorExists = async (color: string): Promise<boolean> => {
-    const annotations = await getAnnotations();
-    return annotations.some((ann) => ann.color && ann.color.toLowerCase() === color.toLowerCase());
-};
-
 export const getAnnotations: () => Promise<Annotation[]> = async () => {
     return await Word.run(async (context) => {
         const ccs = context.document.contentControls;

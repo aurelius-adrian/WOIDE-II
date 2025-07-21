@@ -146,6 +146,12 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                             label: "Form Description",
                             required: true,
                         },
+                        {
+                            id: "color",
+                            type: "colorPicker",
+                            label: "Annotation Type Color",
+                            required: true,
+                        },
                     ]}
                     formData={annotationType}
                 />
