@@ -31,7 +31,6 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
     const [annotationIndex, setAnnotationIndex] = useState<string>("defaultSelector");
     const [editAnnotationData, setEditAnnotationData] = useState<any>(null);
-
     useEffect(() => {
         const _getData = async () => {
             setAnnotationTypes(((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[]);
@@ -87,6 +86,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
             await insertAnnotation({
                 data: JSON.stringify(annotationDetailedData),
+                color: selectedAnnotationType?.color,
             });
             enqueueSnackbar({
                 message: "Annotation Successfully Added.",
@@ -124,6 +124,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
             await updateAnnotation(editAnnotation?.id ?? "", {
                 data: JSON.stringify(annotationDetailedData),
+                color: selectedAnnotationType?.color,
             });
             enqueueSnackbar({
                 message: "Annotation successfully updated.",

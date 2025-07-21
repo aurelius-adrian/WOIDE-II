@@ -4,6 +4,7 @@ import Select from "./formElements/Select";
 import FormElementSelector from "./formElements/FormElementSelector";
 import SelectOptions from "./formElements/SelectOptions";
 import SelectAnnotation from "./formElements/SelectAnnotation";
+import ColorPicker from "./formElements/ColorPicker";
 
 interface FormElementProps {
     description: FormElementDescription;
@@ -22,6 +23,8 @@ export const FormElement = ({ description }: FormElementProps) => {
                 return <FormElementSelector description={description} />;
             case "selectAnnotation":
                 return <SelectAnnotation description={description} />;
+            case "colorPicker":
+                return <ColorPicker description={description} />;
             default:
                 return <div>Error Loading Element</div>;
         }

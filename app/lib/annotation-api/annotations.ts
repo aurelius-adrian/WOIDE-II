@@ -1,6 +1,5 @@
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
-import { getDocumentSetting } from "../settings-api/settings";
 
 export const idSalt = "woideann_";
 
@@ -79,6 +78,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         };
 
         const color = props.color ?? _randomHexColor();
+
         const startSymbol = props.startSymbol ?? "❭";
         const endSymbol = props.endSymbol ?? "❬";
 
@@ -88,6 +88,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         cc_s.appearance = Word.ContentControlAppearance.hidden;
         cc_s.tag = idSalt + "_s" + ret.id;
         cc_s.title = props.data ?? "";
+        cc_s.color = color;
         cc_s.font.color = color;
         cc_s.font.bold = true;
         cc_s.cannotEdit = true;
@@ -118,9 +119,28 @@ export const updateAnnotation = async (
         contentControls.load();
         await context.sync();
 
-        const toUpdate = contentControls.items.filter((cc) => cc.tag === `${idSalt}_s${AnnotationToUpdateID}`);
-        toUpdate[0].cannotEdit = false;
-        toUpdate[0].title = props.data ?? "";
+        const toUpdateStart = contentControls.items.find((cc) => cc.tag === `${idSalt}_s${AnnotationToUpdateID}`);
+        const toUpdateEnd = contentControls.items.find((cc) => cc.tag === `${idSalt}_e${AnnotationToUpdateID}`);
+
+        if (!toUpdateStart || !toUpdateEnd) {
+            console.warn(`Could not find annotation with ID: ${AnnotationToUpdateID}`);
+            return;
+        }
+        toUpdateStart.cannotEdit = false;
+        toUpdateEnd.cannotEdit = false;
+
+        if (props.data !== undefined) {
+            toUpdateStart.title = props.data;
+        }
+        if (props.color) {
+            toUpdateStart.color = props.color;
+            toUpdateStart.font.color = props.color;
+            toUpdateEnd.font.color = props.color;
+        }
+
+        toUpdateStart.cannotEdit = true;
+        toUpdateEnd.cannotEdit = true;
+
         await context.sync();
     });
 };

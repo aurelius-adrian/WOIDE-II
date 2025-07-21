@@ -6,4 +6,5 @@ export type AnnotationType = {
     description?: string;
     formDescription: FormDescription;
     exportData: { [key: string]: string };
+    color: string;
 };
