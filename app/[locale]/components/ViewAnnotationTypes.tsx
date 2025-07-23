@@ -269,6 +269,7 @@ export const ViewAnnotationTypes = ({
                             formDescription: [],
                             name: "New Annotation Type",
                             exportData: {},
+                            color: "",
                         } as AnnotationType)
                     }
                 >
