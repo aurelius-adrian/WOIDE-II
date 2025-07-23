@@ -91,6 +91,10 @@ async function helper(
     range.load();
     await context.sync();
 
+    console.log("Processing range with text: ", range.text, "\n range : ", range);
+
+    if (range.text === "") return ret;
+
     const ccs = await _getAnnotationContentControls(context, range);
 
     let annotation:
@@ -109,6 +113,8 @@ async function helper(
             const data = JSON.parse(start.title) as Annotation;
             if (!annotationExportData[data.annotationTypeId][layer]) continue;
 
+            console.log("found annotation: ", data);
+
             const end = await getAnnotationClosingTag(start, context);
             if (!end) continue;
 
@@ -117,6 +123,7 @@ async function helper(
                 end,
                 data,
             };
+            break;
         } catch (e) {
             console.error("error with parsing annotation data during layer export: \n", e);
         }
