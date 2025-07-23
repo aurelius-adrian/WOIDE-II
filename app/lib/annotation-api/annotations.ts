@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
+import { AnnotationType } from "../utils/annotations";
 
 export const idSalt = "woideann_";
 
@@ -178,3 +179,17 @@ export const deleteAnnotation = async (annotationId: string): Promise<void> => {
         await context.sync();
     });
 };
+
+export function getEmptyJSON(a: AnnotationType): any {
+    const ret: any = {};
+    for (const fe of a.formDescription) {
+        switch (fe.type) {
+            case "select":
+                ret[fe.id] = (fe.options?.map((o) => o.value) ?? []).join(" | ");
+                continue;
+            default:
+                ret[fe.id] = "";
+        }
+    }
+    return ret;
+}

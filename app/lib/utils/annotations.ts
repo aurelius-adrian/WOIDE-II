@@ -7,4 +7,7 @@ export type AnnotationType = {
     formDescription: FormDescription;
     exportData: { [key: string]: string };
     color: string;
+    enableSniffy?: boolean;
+    referenceAnnotationTypeId?: string;
+    referenceDataTemplate?: string;
 };

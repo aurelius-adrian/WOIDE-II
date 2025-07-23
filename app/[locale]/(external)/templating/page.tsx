@@ -11,7 +11,7 @@ import { AddRegular, DeleteRegular, SaveRegular } from "@fluentui/react-icons";
 import { Button } from "@fluentui/react-button";
 import { enqueueSnackbar } from "notistack";
 
-export default function Test() {
+export default function TemplateRenderer() {
     const officeReady = useOfficeReady();
     const searchParams = useSearchParams();
     const data = JSON.parse(atob(searchParams.get("data") || ""));
@@ -36,6 +36,7 @@ export default function Test() {
     const [isJsonVisible, setIsJsonVisible] = useState(true);
 
     const selectId = useId();
+    const selectId1 = useId();
 
     useEffect(() => {
         if (officeReady)
@@ -106,7 +107,13 @@ export default function Test() {
                         autoFocus
                     />
                 ) : (
-                    <Select id={selectId} value={selectedCodeKey} onChange={handleKeySelection} className={"flex-1"}>
+                    <Select
+                        id={selectId}
+                        value={selectedCodeKey}
+                        onChange={handleKeySelection}
+                        className={"flex-1"}
+                        disabled={data?.singleLayer}
+                    >
                         {Object.keys(exportLayers).map((key) => (
                             <option key={key} value={key}>
                                 {key}
@@ -114,24 +121,39 @@ export default function Test() {
                         ))}
                     </Select>
                 )}
-                <Button
-                    onClick={handleDeleteLayer}
-                    disabled={exportLayers[selectedCodeKey] === undefined && editingKeyValue === undefined}
-                    appearance="secondary"
-                    icon={editingKeyValue === undefined ? <DeleteRegular /> : undefined}
-                >
-                    {editingKeyValue === undefined ? "Delete" : "Cancel"}
-                </Button>
-                <Button
-                    onClick={addNewCodeState}
-                    appearance="primary"
-                    icon={editingKeyValue === undefined ? <AddRegular /> : undefined}
-                >
-                    {editingKeyValue === undefined ? "Add new Layer" : "Save"}
-                </Button>
+                {!data?.singleLayer && (
+                    <Button
+                        onClick={handleDeleteLayer}
+                        disabled={exportLayers[selectedCodeKey] === undefined && editingKeyValue === undefined}
+                        appearance="secondary"
+                        icon={editingKeyValue === undefined ? <DeleteRegular /> : undefined}
+                    >
+                        {editingKeyValue === undefined ? "Delete" : "Cancel"}
+                    </Button>
+                )}
+                {!data?.singleLayer && (
+                    <Button
+                        onClick={addNewCodeState}
+                        appearance="primary"
+                        icon={editingKeyValue === undefined ? <AddRegular /> : undefined}
+                    >
+                        {editingKeyValue === undefined ? "Add new Layer" : "Save"}
+                    </Button>
+                )}
             </div>
 
-            <div className={"h-96 border-blue-900 border-2 rounded-md py-2"}>
+            <div className={"h-96 border-blue-900 border-2 rounded-md pt-2 pb-10"}>
+                <Select id={selectId1} value={""} onChange={() => {}} className={"mb-2 px-2"}>
+                    {(!data?.allowedMarkup || data.allowedMarkup.includes("html")) && (
+                        <option value={"html"}>HTML</option>
+                    )}
+                    {(!data?.allowedMarkup || data.allowedMarkup.includes("json")) && (
+                        <option value={"json"}>JSON</option>
+                    )}
+                    {(!data?.allowedMarkup || data.allowedMarkup.includes("typescript")) && (
+                        <option value={"typescript"}>typescript</option>
+                    )}
+                </Select>
                 <Editor
                     height="100%"
                     language="html"
