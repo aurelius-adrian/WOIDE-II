@@ -91,8 +91,6 @@ async function helper(
     range.load();
     await context.sync();
 
-    console.log("Processing range with text: ", range.text, "\n range : ", range);
-
     if (range.text === "") return ret;
 
     const ccs = await _getAnnotationContentControls(context, range);
@@ -112,8 +110,6 @@ async function helper(
             if (start.title === undefined) continue;
             const data = JSON.parse(start.title) as Annotation;
             if (!annotationExportData[data.annotationTypeId][layer]) continue;
-
-            console.log("found annotation: ", data);
 
             const end = await getAnnotationClosingTag(start, context);
             if (!end) continue;
