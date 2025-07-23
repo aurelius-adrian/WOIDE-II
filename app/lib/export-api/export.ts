@@ -144,15 +144,15 @@ async function helper(
         annotation.end.getRange(Word.RangeLocation.before),
     );
 
-    const data: Annotation & { getInnerHTML?: string; getChildrenEval?: string } = { ...annotation.data };
-    const template = annotationExportData[data.annotationTypeId][layer];
+    const data: any & { getInnerHTML?: string; getChildrenEval?: string } = { ...annotation.data.data };
+    const template = annotationExportData[annotation.data.annotationTypeId][layer];
 
     if (template.includes("getInnerHTML")) {
         const res = await Promise.all(await helper(aRange, layer, context, false));
         data.getInnerHTML = res.join("\n");
     }
 
-    if (annotationExportData[data.annotationTypeId][layer].includes("getChildrenEval")) {
+    if (annotationExportData[annotation.data.annotationTypeId][layer].includes("getChildrenEval")) {
         const res = await Promise.all(await helper(aRange, layer, context, true));
         data.getChildrenEval = res.join("\n");
     }
