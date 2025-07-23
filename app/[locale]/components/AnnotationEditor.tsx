@@ -30,7 +30,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const [selectedAnnotationType, setSelectedAnnotationType] = useState<AnnotationType | null>(null);
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
     const [annotationIndex, setAnnotationIndex] = useState<string>("defaultSelector");
-    const [editAnnotationData, setEditAnnotationData] = useState<any>(null);
+
     useEffect(() => {
         const _getData = async () => {
             setAnnotationTypes(((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[]);
@@ -41,25 +41,18 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
     useEffect(() => {
         if (editAnnotation) {
-            const filterdData = Object.fromEntries(
-                Object.entries(JSON.parse(editAnnotation.data ?? "{}")).filter(
-                    ([key]) => key !== "formDescription" && key !== "id",
-                ),
-            );
-            const { name, ...formDataSelectedAnnotation } = filterdData;
-            const indexToEdit = annotationTypes.findIndex((e) => e.name === name);
-            if (indexToEdit !== -1 && name !== "") {
+            const indexToEdit = annotationTypes.findIndex((e) => e.id === editAnnotation.annotationTypeId);
+            if (indexToEdit !== -1) {
                 setAnnotationIndex(indexToEdit.toString());
                 setSelectedAnnotationType(annotationTypes[indexToEdit]);
             }
-            setEditAnnotationData(formDataSelectedAnnotation);
         }
     }, [editAnnotation, annotationTypes]);
 
     useEffect(() => {
-        if (selectedAnnotationType && editAnnotationData !== null) {
+        if (selectedAnnotationType && editAnnotation !== null) {
             formRef.current?.update({
-                ...editAnnotationData,
+                ...editAnnotation?.data,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,14 +71,9 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 return;
             }
 
-            const annotationDetailedData = {
-                ...data,
-                ...selectedAnnotationType,
-                annotationTypeId: selectedAnnotationType?.id,
-            };
-
             await insertAnnotation({
-                data: JSON.stringify(annotationDetailedData),
+                data: { ...data },
+                annotationTypeId: selectedAnnotationType?.id,
                 color: selectedAnnotationType?.color,
             });
             enqueueSnackbar({
@@ -116,14 +104,9 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 return;
             }
 
-            const annotationDetailedData = {
-                ...data,
-                ...selectedAnnotationType,
-                annotationTypeId: selectedAnnotationType?.id,
-            };
-
             await updateAnnotation(editAnnotation?.id ?? "", {
-                data: JSON.stringify(annotationDetailedData),
+                data: { ...data },
+                annotationTypeId: selectedAnnotationType?.id,
                 color: selectedAnnotationType?.color,
             });
             enqueueSnackbar({
@@ -173,7 +156,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 <Form
                     formDescription={selectedAnnotationType?.formDescription ?? []}
                     ref={formRef}
-                    {...(editAnnotationData && { formData: { ...editAnnotationData } })}
+                    formData={editAnnotation?.data}
                 />
             </div>
             {editAnnotation ? (

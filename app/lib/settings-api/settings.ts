@@ -98,3 +98,16 @@ export const getAllExportLayers = async (): Promise<string[]> => {
 
     return [...ret];
 };
+
+export async function getAnnotationTypesAsDict(): Promise<Record<string, AnnotationType>> {
+    const types = await getDocumentSetting<AnnotationType[]>("annotationTypes");
+    if (!types) return {};
+
+    const ret: Record<string, AnnotationType> = {};
+    types.forEach((e) => {
+        if (!e.id) return;
+        ret[e.id] = e;
+    });
+
+    return ret;
+}

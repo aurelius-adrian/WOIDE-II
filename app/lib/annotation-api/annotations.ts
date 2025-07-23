@@ -23,9 +23,12 @@ export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () =
             (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
         );
         return list.map((e) => {
+            const _data = JSON.parse(e.title);
+
             return {
                 id: e.tag.slice(idSalt.length + 2),
-                data: e.title,
+                annotationTypeId: _data.annotationTypeId,
+                data: _data.data,
                 color: e.color,
             } as Annotation;
         });
@@ -39,9 +42,12 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
         await context.sync();
         const list = ccs.items.filter((e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
         return list.map((e) => {
+            const _data = JSON.parse(e.title);
+
             return {
                 id: e.tag.slice(idSalt.length + 2),
-                data: e.title,
+                annotationTypeId: _data.annotationTypeId,
+                data: _data.data,
                 color: e.color,
             } as Annotation;
         });
@@ -88,7 +94,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         const cc_s = startSymbolRange.insertContentControl();
         cc_s.appearance = Word.ContentControlAppearance.hidden;
         cc_s.tag = idSalt + "_s" + ret.id;
-        cc_s.title = props.data ?? "";
+        cc_s.title = JSON.stringify({ annotationTypeId: props.annotationTypeId, data: props.data });
         cc_s.color = color;
         cc_s.font.color = color;
         cc_s.font.bold = true;
@@ -130,9 +136,8 @@ export const updateAnnotation = async (
         toUpdateStart.cannotEdit = false;
         toUpdateEnd.cannotEdit = false;
 
-        if (props.data !== undefined) {
-            toUpdateStart.title = props.data;
-        }
+        toUpdateStart.title = JSON.stringify({ annotationTypeId: props.annotationTypeId, data: props.data });
+
         if (props.color) {
             toUpdateStart.color = props.color;
             toUpdateStart.font.color = props.color;

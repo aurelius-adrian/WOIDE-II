@@ -12,6 +12,8 @@ import {
 import { EditRegular } from "@fluentui/react-icons";
 import { Annotation } from "../../lib/annotation-api/types";
 import { enqueueSnackbar } from "notistack";
+import { AnnotationType } from "../../lib/utils/annotations";
+import { getAnnotationTypesAsDict } from "../../lib/settings-api/settings";
 
 interface AnnotationViewProps {
     currentAnnotation: Annotation;
@@ -29,13 +31,17 @@ export const AnnotationView = ({
     setEditAnnotation,
 }: AnnotationViewProps) => {
     const [annotationText, setAnnotationText] = useState("");
+    const [annotationType, setAnnotationType] = useState<AnnotationType | undefined>(undefined);
 
     useEffect(() => {
-        const fetchAnnotationText = async () => {
+        const initData = async () => {
+            const annotationTypes = (await getAnnotationTypesAsDict()) ?? {};
+            setAnnotationType(annotationTypes[currentAnnotation.annotationTypeId]);
+
             const text = await getAnnotationTextByID(currentAnnotation.id);
             setAnnotationText(text ? text.replace(/[❭❬]/g, "") : "");
         };
-        fetchAnnotationText();
+        initData();
     }, [currentAnnotation]);
 
     const _getAnnotations = async () => {
@@ -63,12 +69,13 @@ export const AnnotationView = ({
         setEditAnnotation(annotationToEdit);
         setEditMode(true);
     };
+
     return (
         <>
             <div className="annotationList">
                 <div className="annotationListItem rounded-xl shadow-md p-4 border mb-1 mt-1 max-w-md">
                     <div className="text-sm font-semibold  mb-2">
-                        {currentAnnotation.data ? JSON.parse(currentAnnotation.data).name : "Annotation Type Misssing"}
+                        {annotationType ? annotationType.name : "Annotation Type Misssing"}
                     </div>
 
                     <div className="text-xs line-clamp-2">{annotationText}</div>

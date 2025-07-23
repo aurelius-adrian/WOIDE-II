@@ -1,9 +1,14 @@
 /* eslint-disable max-len */
-import { insertAnnotation } from "../../lib/annotation-api/annotations";
-import { highlightAnnotationID } from "../../lib/annotation-api/navigation";
+import { getAnnotations } from "../../lib/annotation-api/annotations";
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
-import { Export, saveStringToFile } from "../../lib/export-api/export";
+import { saveStringToFile } from "../../lib/export-api/export";
+import { getAnnotationTypesAsDict } from "../../lib/settings-api/settings";
+import { AnnotationType } from "../../lib/utils/annotations";
+import { getAnnotationTextByID } from "../../lib/annotation-api/navigation";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Mustache = require("mustache");
 
 const Test = () => {
     const dialog = useRef<Office.Dialog>();
@@ -23,12 +28,45 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         });
     };
 
-    const test_2 = () => {
-        insertAnnotation({
-            data: "",
-        }).then((r) => {
-            if (r !== null) highlightAnnotationID(r).then(() => {});
-        });
+    const test_2 = async () => {
+        const types = await getAnnotationTypesAsDict();
+
+        const sniffyTypes = Object.keys(types)
+            .filter((key) => types[key].enableSniffy)
+            .reduce((res: { [id: string]: AnnotationType }, key) => {
+                res[key] = types[key];
+                return res;
+            }, {});
+
+        console.log("sniffyTypes: ", sniffyTypes);
+
+        const glossary: { [term: string]: any } = {};
+
+        const annotations = await getAnnotations();
+        for (const a of annotations) {
+            console.log("annotation: ", a);
+            const type = sniffyTypes[a.annotationTypeId];
+            if (type === undefined) continue;
+
+            const text = (await getAnnotationTextByID(a.id))?.replace(/^❭\s|\s❬$/g, "");
+            if (!text) {
+                console.debug("Could not get text for annotation", a.id);
+                continue;
+            }
+
+            if (type.referenceDataTemplate === undefined) {
+                console.error("Reference data template is undefined for annotation type: ", type.id);
+                continue;
+            }
+
+            try {
+                glossary[text] = JSON.parse(Mustache.render(type.referenceDataTemplate, a.data));
+            } catch (e) {
+                console.error("Could not parse glossary entry: ", e);
+            }
+        }
+
+        console.log("glossary: ", glossary);
     };
 
     const test_3 = async () => {

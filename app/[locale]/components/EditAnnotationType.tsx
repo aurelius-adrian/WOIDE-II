@@ -131,7 +131,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
 
     function processDataTemplateDataMessage(arg: any) {
         try {
-            const data = JSON.parse(arg.message);
+            const data = JSON.parse(arg.message)?.default;
             setDataTemplateData(data);
             saveAnnotationType(undefined, data);
         } catch (e) {
@@ -190,7 +190,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 JSON.stringify({
                     ...formApi.current?.getFormData(),
                     exportData: {
-                        default: JSON.stringify(getEmptyJSON(aT)),
+                        default: dataTemplateData ?? JSON.stringify(getEmptyJSON(aT)),
                     },
                     singleLayer: true,
                     allowedMarkup: ["json"],
