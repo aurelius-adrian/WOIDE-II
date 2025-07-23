@@ -21,6 +21,7 @@ export default function TemplateRenderer() {
         ...(_formData || {}),
         getInnerHTML: () => "{inner HTML}",
         getChildrenEval: () => "{children eval}",
+        ...(data.globalDocumentData || {}),
     };
     const formRef = useRef<AnnotationFormApi>(null);
 
@@ -214,6 +215,14 @@ export default function TemplateRenderer() {
                                     "returning the export result."}
                             </code>
                         </pre>
+                        {data.globalDocumentData && (
+                            <>
+                                <div className="my-2">Global Document Data:</div>
+                                <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                                    <code className="text-sm">{JSON.stringify(data.globalDocumentData, null, 2)}</code>
+                                </pre>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

@@ -15,6 +15,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
     const [tmpId, setTmpId] = useState<string | null>(null);
     const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>(annotationType.exportData);
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
+    const [globalDocumentData, setGlobalDocumentData] = useState<{ [key: string]: string }>({});
     const [selectedReferenceAnnotationTypeId, setSelectedReferenceAnnotationTypeId] = useState<string>(
         annotationType.referenceAnnotationTypeId ?? "",
     );
@@ -27,6 +28,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
     useEffect(() => {
         const _getData = async () => {
             setAnnotationTypes(((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[]);
+            setGlobalDocumentData((await getDocumentSetting("globalDocumentData")) ?? {});
         };
 
         if (officeReady) _getData();
@@ -150,6 +152,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 JSON.stringify({
                     ...formApi.current?.getFormData(),
                     exportData,
+                    globalDocumentData,
                 }),
             ),
         );
@@ -192,6 +195,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                     exportData: {
                         default: dataTemplateData ?? JSON.stringify(getEmptyJSON(aT)),
                     },
+                    globalDocumentData,
                     singleLayer: true,
                     allowedMarkup: ["json"],
                 }),

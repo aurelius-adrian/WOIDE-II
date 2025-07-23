@@ -3,7 +3,7 @@ import { getAnnotations } from "../../lib/annotation-api/annotations";
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
 import { saveStringToFile } from "../../lib/export-api/export";
-import { getAnnotationTypesAsDict } from "../../lib/settings-api/settings";
+import { getAllDocumentSettings, getAnnotationTypesAsDict } from "../../lib/settings-api/settings";
 import { AnnotationType } from "../../lib/utils/annotations";
 import { getAnnotationTextByID } from "../../lib/annotation-api/navigation";
 
@@ -70,12 +70,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     };
 
     const test_3 = async () => {
-        Word.run(async (context) => {
-            const ccs = context.document.body.contentControls;
-            ccs.load();
-            await context.sync();
-            console.log(ccs.items);
-        });
+        console.log(await getAllDocumentSettings());
     };
 
     const test_4 = async () => {
