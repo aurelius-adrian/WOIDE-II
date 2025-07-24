@@ -3,6 +3,7 @@ import { cn } from "../../lib/utils/tailwind";
 import { Button } from "@fluentui/react-button";
 import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
+import { useDarkModeContext } from "./Setup";
 
 interface GlobalDocumentDataEditorProps {
     data: any;
@@ -12,6 +13,7 @@ interface GlobalDocumentDataEditorProps {
 
 export default function GlobalDocumentDataEditor({ data, setData, className = "" }: GlobalDocumentDataEditorProps) {
     const [value, setValue] = useState<string | undefined>(JSON.stringify(data, null, 2));
+    const { darkMode } = useDarkModeContext();
 
     useEffect(() => {
         setValue(JSON.stringify(data, null, 2));
@@ -41,7 +43,13 @@ export default function GlobalDocumentDataEditor({ data, setData, className = ""
 
     return (
         <div className={cn("h-36 flex flex-col space-y-2", className)}>
-            <Editor value={value} onChange={setValue} className={"flex-grow"} language={"json"} />
+            <Editor
+                value={value}
+                onChange={setValue}
+                className={"flex-grow"}
+                language={"json"}
+                theme={darkMode ? "vs-dark" : "light"}
+            />
             <div className={"flex-grow-0"}>
                 <Button onClick={() => onChange(value)} className={"h-8"}>
                     Save Data

@@ -6,7 +6,7 @@ import Form, { AnnotationFormApi } from "../../components/Form";
 import { ToggleButton } from "@fluentui/react-components";
 import { Select } from "@fluentui/react-select";
 import { useId } from "@fluentui/react-utilities";
-import { useOfficeReady } from "../../components/Setup";
+import { useDarkModeContext, useOfficeReady } from "../../components/Setup";
 import { AddRegular, DeleteRegular, SaveRegular } from "@fluentui/react-icons";
 import { Button } from "@fluentui/react-button";
 import { enqueueSnackbar } from "notistack";
@@ -15,13 +15,14 @@ export default function TemplateRenderer() {
     const officeReady = useOfficeReady();
     const searchParams = useSearchParams();
     const data = JSON.parse(atob(searchParams.get("data") || ""));
+    const { darkMode } = useDarkModeContext();
 
     const [_formData, _setFormData] = useState();
     const formData = {
+        ...(data.globalDocumentData || {}),
         ...(_formData || {}),
         getInnerHTML: () => "{inner HTML}",
         getChildrenEval: () => "{children eval}",
-        ...(data.globalDocumentData || {}),
     };
     const formRef = useRef<AnnotationFormApi>(null);
 
@@ -158,7 +159,7 @@ export default function TemplateRenderer() {
                 <Editor
                     height="100%"
                     language="html"
-                    theme="light"
+                    theme={darkMode ? "vs-dark" : "light"}
                     value={exportLayers[selectedCodeKey] || ""}
                     options={{
                         lineNumbers: "on",
@@ -202,11 +203,11 @@ export default function TemplateRenderer() {
                 {isJsonVisible && (
                     <div className={"border-blue-900 border-2 rounded-md p-2 flex-1"}>
                         <div className="mb-2">Available Keys/Test Values:</div>
-                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
-                            <code className="text-sm">{JSON.stringify(formData, null, 2)}</code>
+                        <pre className="bg-gray-100 dark:bg-black p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                            <code className="text-sm">{JSON.stringify(_formData, null, 2)}</code>
                         </pre>
                         <div className="my-2">Available Functions:</div>
-                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                        <pre className="bg-gray-100 dark:bg-black p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
                             <code className="text-sm">
                                 {"getInnerHTML: Gets the HTML content within the annotation and evaluates all " +
                                     "children with the same layer key returning the export result." +
@@ -218,7 +219,7 @@ export default function TemplateRenderer() {
                         {data.globalDocumentData && (
                             <>
                                 <div className="my-2">Global Document Data:</div>
-                                <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                                <pre className="bg-gray-100 dark:bg-black p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
                                     <code className="text-sm">{JSON.stringify(data.globalDocumentData, null, 2)}</code>
                                 </pre>
                             </>
