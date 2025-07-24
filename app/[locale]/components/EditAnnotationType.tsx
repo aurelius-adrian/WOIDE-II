@@ -193,7 +193,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 JSON.stringify({
                     ...formApi.current?.getFormData(),
                     exportData: {
-                        default: dataTemplateData ?? JSON.stringify(getEmptyJSON(aT)),
+                        default: dataTemplateData || JSON.stringify(getEmptyJSON(aT)),
                     },
                     globalDocumentData,
                     singleLayer: true,
