@@ -73,7 +73,7 @@ export const AnnotationView = ({
     return (
         <>
             <div className="annotationList">
-                <div className="annotationListItem rounded-xl shadow-md p-4 border mb-1 mt-1 max-w-md">
+                <div className="annotationListItem rounded-xl shadow-md p-4 border mb-1 mt-1">
                     <div className="text-sm font-semibold  mb-2">
                         {annotationType ? annotationType.name : "Annotation Type Misssing"}
                     </div>
