@@ -14,6 +14,8 @@ const annotationExportData: Record<
     }
 > = {};
 
+let globalDocumentData: any = {};
+
 const documentHTMLExportTemplate = `<html>
     <head>
         {{{HTMLHead}}}
@@ -47,6 +49,8 @@ export function saveStringToFile(data: string, filename: string, type = "text/pl
 
 export async function Export(layer: string): Promise<string> {
     return await Word.run(async (context) => {
+        globalDocumentData = (await getDocumentSetting("globalDocumentData")) ?? {};
+
         const documentExportTemplate =
             (
                 ((await getDocumentSetting("documentExportSettings")) ?? {}) as {
@@ -144,7 +148,10 @@ async function helper(
         annotation.end.getRange(Word.RangeLocation.before),
     );
 
-    const data: any & { getInnerHTML?: string; getChildrenEval?: string } = { ...annotation.data.data };
+    const data: any & {
+        getInnerHTML?: string;
+        getChildrenEval?: string;
+    } = { ...globalDocumentData, ...annotation.data.data };
     const template = annotationExportData[annotation.data.annotationTypeId][layer];
 
     if (template.includes("getInnerHTML")) {
