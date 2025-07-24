@@ -36,6 +36,7 @@ export default function TemplateRenderer() {
     const [isFormVisible, setIsFormVisible] = useState(true);
     const [isOutputVisible, setIsOutputVisible] = useState(true);
     const [isJsonVisible, setIsJsonVisible] = useState(true);
+    const [language, setLanguage] = useState<string>(data?.allowedMarkup?.length ? data?.allowedMarkup[0] : "html");
 
     const selectId = useId();
     const selectId1 = useId();
@@ -145,7 +146,14 @@ export default function TemplateRenderer() {
             </div>
 
             <div className={"h-96 border-blue-900 border-2 rounded-md pt-2 pb-10"}>
-                <Select id={selectId1} value={""} onChange={() => {}} className={"mb-2 px-2"}>
+                <Select
+                    id={selectId1}
+                    value={language}
+                    onChange={(e) => {
+                        setLanguage(e.target.value);
+                    }}
+                    className={"mb-2 px-2"}
+                >
                     {(!data?.allowedMarkup || data.allowedMarkup.includes("html")) && (
                         <option value={"html"}>HTML</option>
                     )}
@@ -158,7 +166,7 @@ export default function TemplateRenderer() {
                 </Select>
                 <Editor
                     height="100%"
-                    language="html"
+                    language={language}
                     theme={darkMode ? "vs-dark" : "light"}
                     value={exportLayers[selectedCodeKey] || ""}
                     options={{
