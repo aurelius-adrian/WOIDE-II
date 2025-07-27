@@ -4,7 +4,13 @@ import FormElement from "./FormElement";
 import { FormElementSelectorData } from "./formElements/FormElementSelector";
 import { SelectOptionsData } from "./formElements/SelectOptions";
 
-export const ExternalFormElementTypesList = ["textInput", "select", "selectAnnotation", "colorPicker"] as const;
+export const ExternalFormElementTypesList = [
+    "textInput",
+    "select",
+    "selectAnnotation",
+    "colorPicker",
+    "checkbox",
+] as const;
 export const InternalFormElementTypesList = ["formElementSelector", "selectOptions"] as const;
 export const FormElementTypesList = [...ExternalFormElementTypesList, ...InternalFormElementTypesList] as const;
 export type FormElementTypes = (typeof FormElementTypesList)[number];

@@ -1,7 +1,12 @@
-export const ImportantFieldIndicator = () => {
+export const RequiredLabel = ({ label, required }: { label: string; required: boolean | undefined }) => {
     return (
-        <span className="text-red-500" title="This field is required.">
-            *
-        </span>
+        <>
+            {label}
+            {required && (
+                <span className="text-red-500" title="This field is required.">
+                    *
+                </span>
+            )}
+        </>
     );
 };

@@ -2,6 +2,7 @@ import React, { useId } from "react";
 import { FormElementDescription } from "../Form";
 import { Controller, useFormContext } from "react-hook-form";
 import { Label } from "@fluentui/react-components";
+import { RequiredLabel } from "./ImportantFieldIndicator";
 
 interface ColorPickerProps {
     description: FormElementDescription;
@@ -34,7 +35,7 @@ export const ColorPicker = ({ description }: ColorPickerProps) => {
                             />
                         </div>
                         <Label htmlFor={id} className="font-medium">
-                            Select Annotation Color
+                            <RequiredLabel required={description.required} label={description.label} />
                         </Label>
                     </div>
                 )}
