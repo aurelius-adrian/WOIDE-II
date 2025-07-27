@@ -210,11 +210,17 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             </div>
 
             {editAnnotation ? (
-                <div className="space-y-2">
-                    <Button onClick={updateAnnotationData}>Update Annotation Data</Button>
-                    <Button onClick={updateAnnotationRangeHandler} disabled={isUpdatingRange} appearance="secondary">
-                        {isUpdatingRange ? "Updating Range..." : "Update Annotation Range"}
-                    </Button>
+                <div className="space-y-2 ">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                        <Button onClick={updateAnnotationData}>Update Annotation Data</Button>
+                        <Button
+                            onClick={updateAnnotationRangeHandler}
+                            disabled={isUpdatingRange}
+                            appearance="secondary"
+                        >
+                            {isUpdatingRange ? "Updating Range..." : "Update Annotation Range"}
+                        </Button>
+                    </div>
                     <div className="text-xs text-gray-600 mt-1">
                         To update the range, select the new text in the document and click Update Annotation Range
                     </div>
