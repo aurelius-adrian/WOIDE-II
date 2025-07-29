@@ -153,9 +153,23 @@ export const updateAnnotationRange = async (annotationId: string, props: Annotat
             throw new Error("Annotation not found.");
         }
 
-        startCC.load("title, font/color");
-        endCC.load("font/color");
+        startCC.load();
+        endCC.load();
         await context.sync();
+
+        const fullRange = startCC.getRange("After").expandTo(endCC.getRange("Before"));
+        fullRange.load();
+        await context.sync();
+
+        fullRange.font.load("color");
+        await context.sync();
+
+
+        const fullText = fullRange.text;
+        const cleanedText = fullText.trim();
+        
+        const textColor = fullRange.font.color;
+        
 
         const existingData = startCC.title;
         const existingColor = startCC.font.color;
@@ -167,8 +181,15 @@ export const updateAnnotationRange = async (annotationId: string, props: Annotat
 
         startCC.cannotEdit = false;
         endCC.cannotEdit = false;
+        startCC.font.color = textColor;
+        startCC.font.bold = false;
+        endCC.font.color = textColor;
+        endCC.font.bold = false;
         await context.sync();
 
+        fullRange.insertText(cleanedText, Word.InsertLocation.replace);
+        await context.sync();
+        
         startCC.delete(false);
         endCC.delete(false);
         await context.sync();
