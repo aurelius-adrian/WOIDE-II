@@ -95,6 +95,8 @@ async function helper(
     range.load();
     await context.sync();
 
+    console.log("for range", range.text, range);
+
     if (range.text === "") return ret;
 
     const ccs = await _getAnnotationContentControls(context, range);
@@ -126,6 +128,25 @@ async function helper(
             break;
         } catch (e) {
             console.error("error with parsing annotation data during layer export: \n", e);
+        }
+    }
+
+    if (annotation?.end) {
+        const _range = annotation?.end.getRange();
+        _range.load();
+        await context.sync();
+
+        const _res = range.compareLocationWith(_range);
+        await context.sync();
+
+        if (
+            _res.value !== Word.LocationRelation.contains &&
+            _res.value !== Word.LocationRelation.containsStart &&
+            _res.value !== Word.LocationRelation.containsEnd &&
+            _res.value !== Word.LocationRelation.equal
+        ) {
+            console.log("compareLocationWith", _res.value);
+            annotation = undefined;
         }
     }
 
