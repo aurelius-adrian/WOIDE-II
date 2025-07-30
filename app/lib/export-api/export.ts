@@ -95,8 +95,6 @@ async function helper(
     range.load();
     await context.sync();
 
-    console.log("for range", range.text, range);
-
     if (range.text === "") return ret;
 
     const ccs = await _getAnnotationContentControls(context, range);
@@ -145,7 +143,6 @@ async function helper(
             _res.value !== Word.LocationRelation.containsEnd &&
             _res.value !== Word.LocationRelation.equal
         ) {
-            console.log("compareLocationWith", _res.value);
             annotation = undefined;
         }
     }
