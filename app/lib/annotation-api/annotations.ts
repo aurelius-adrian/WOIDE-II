@@ -89,8 +89,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         const startSymbol = props.startSymbol ?? "❭";
         const endSymbol = props.endSymbol ?? "❬";
 
-        start.insertText(" ", Word.InsertLocation.after);
-        const startSymbolRange = start.insertText(startSymbol, Word.InsertLocation.replace);
+        const startSymbolRange = start.insertText(startSymbol, Word.InsertLocation.before);
         const cc_s = startSymbolRange.insertContentControl();
         cc_s.appearance = Word.ContentControlAppearance.hidden;
         cc_s.tag = idSalt + "_s" + ret.id;
@@ -98,17 +97,13 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         cc_s.color = color;
         cc_s.font.color = color;
         cc_s.font.bold = true;
-        cc_s.cannotEdit = true;
 
-        end.insertText(" ", Word.InsertLocation.before);
-        const endSymbolRange = end.insertText(endSymbol, Word.InsertLocation.replace);
+        const endSymbolRange = end.insertText(endSymbol, Word.InsertLocation.after);
         const cc_e = endSymbolRange.insertContentControl();
-        cc_e.cannotEdit = false;
         cc_e.appearance = Word.ContentControlAppearance.hidden;
         cc_e.tag = idSalt + "_e" + ret.id;
         cc_e.font.color = color;
         cc_e.font.bold = true;
-        cc_e.cannotEdit = true;
 
         start.select(Word.SelectionMode.start);
         await context.sync();

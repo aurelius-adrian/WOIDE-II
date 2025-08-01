@@ -91,7 +91,8 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             });
             _getAnnotations();
             setEditMode(false);
-        } catch {
+        } catch (e) {
+            console.error(e);
             enqueueSnackbar({
                 message: "Select text and complete the form to add annotation.",
                 variant: "error",
