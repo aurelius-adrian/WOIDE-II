@@ -147,7 +147,7 @@ export const updateAnnotation = async (
 };
 
 export const _getAnnotationRange = (start: Word.Range, end: Word.Range): Word.Range => {
-    return start.expandTo(end);
+    return start.getRange(Word.RangeLocation.after).expandTo(end.getRange(Word.RangeLocation.start));
 };
 
 export const deleteAnnotation = async (annotationId: string): Promise<void> => {
