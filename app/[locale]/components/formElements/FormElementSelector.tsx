@@ -70,6 +70,12 @@ const FormElementSelect = ({ description }: FormElementSelectorProps) => {
                 type: "textInput",
                 required: true,
             },
+            {
+                id: `${path}.required`,
+                label: "Required",
+                type: "checkbox",
+                required: false,
+            },
         ];
 
         const elementsDescription: mapType = {

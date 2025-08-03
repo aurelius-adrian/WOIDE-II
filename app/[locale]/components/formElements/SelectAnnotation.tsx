@@ -9,7 +9,7 @@ import { timedHighlightAnnotationID } from "../../../lib/annotation-api/navigati
 import { EyeFilled, InfoRegular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
-import { ImportantFieldIndicator } from "./ImportantFieldIndicator";
+import { RequiredLabel } from "./ImportantFieldIndicator";
 
 interface TextInputProps {
     description: FormElementDescription;
@@ -49,7 +49,7 @@ export const TextInput = ({ description }: TextInputProps) => {
                 control={control}
                 name={description.id}
                 rules={{
-                    required: description.required ?? false,
+                    required: description.required || false,
                 }}
                 render={({ field }) => (
                     <div className={"flex flex-col gap-0.5"}>
@@ -62,7 +62,7 @@ export const TextInput = ({ description }: TextInputProps) => {
                                 >
                                     <Label htmlFor={id} disabled={field.disabled}>
                                         {description.label}
-                                        {description.required && <ImportantFieldIndicator />}
+                                        <RequiredLabel required={description.required} label={description.label} />
                                     </Label>
                                 </AccordionHeader>
                                 <AccordionPanel>

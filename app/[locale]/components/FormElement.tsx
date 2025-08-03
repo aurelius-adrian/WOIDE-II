@@ -4,6 +4,8 @@ import Select from "./formElements/Select";
 import FormElementSelector from "./formElements/FormElementSelector";
 import SelectOptions from "./formElements/SelectOptions";
 import SelectAnnotation from "./formElements/SelectAnnotation";
+import ColorPicker from "./formElements/ColorPicker";
+import Checkbox from "./formElements/Checkbox";
 
 interface FormElementProps {
     description: FormElementDescription;
@@ -22,6 +24,10 @@ export const FormElement = ({ description }: FormElementProps) => {
                 return <FormElementSelector description={description} />;
             case "selectAnnotation":
                 return <SelectAnnotation description={description} />;
+            case "colorPicker":
+                return <ColorPicker description={description} />;
+            case "checkbox":
+                return <Checkbox description={description} />;
             default:
                 return <div>Error Loading Element</div>;
         }

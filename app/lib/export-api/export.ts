@@ -14,6 +14,8 @@ const annotationExportData: Record<
     }
 > = {};
 
+let globalDocumentData: any = {};
+
 const documentHTMLExportTemplate = `<html>
     <head>
         {{{HTMLHead}}}
@@ -47,6 +49,8 @@ export function saveStringToFile(data: string, filename: string, type = "text/pl
 
 export async function Export(layer: string): Promise<string> {
     return await Word.run(async (context) => {
+        globalDocumentData = (await getDocumentSetting("globalDocumentData")) ?? {};
+
         const documentExportTemplate =
             (
                 ((await getDocumentSetting("documentExportSettings")) ?? {}) as {
@@ -91,6 +95,8 @@ async function helper(
     range.load();
     await context.sync();
 
+    if (range.text === "") return ret;
+
     const ccs = await _getAnnotationContentControls(context, range);
 
     let annotation:
@@ -117,8 +123,27 @@ async function helper(
                 end,
                 data,
             };
+            break;
         } catch (e) {
             console.error("error with parsing annotation data during layer export: \n", e);
+        }
+    }
+
+    if (annotation?.end) {
+        const _range = annotation?.end.getRange();
+        _range.load();
+        await context.sync();
+
+        const _res = range.compareLocationWith(_range);
+        await context.sync();
+
+        if (
+            _res.value !== Word.LocationRelation.contains &&
+            _res.value !== Word.LocationRelation.containsStart &&
+            _res.value !== Word.LocationRelation.containsEnd &&
+            _res.value !== Word.LocationRelation.equal
+        ) {
+            annotation = undefined;
         }
     }
 
@@ -141,15 +166,18 @@ async function helper(
         annotation.end.getRange(Word.RangeLocation.before),
     );
 
-    const data: Annotation & { getInnerHTML?: string; getChildrenEval?: string } = { ...annotation.data };
-    const template = annotationExportData[data.annotationTypeId][layer];
+    const data: any & {
+        getInnerHTML?: string;
+        getChildrenEval?: string;
+    } = { ...globalDocumentData, ...annotation.data.data };
+    const template = annotationExportData[annotation.data.annotationTypeId][layer];
 
     if (template.includes("getInnerHTML")) {
         const res = await Promise.all(await helper(aRange, layer, context, false));
         data.getInnerHTML = res.join("\n");
     }
 
-    if (annotationExportData[data.annotationTypeId][layer].includes("getChildrenEval")) {
+    if (annotationExportData[annotation.data.annotationTypeId][layer].includes("getChildrenEval")) {
         const res = await Promise.all(await helper(aRange, layer, context, true));
         data.getChildrenEval = res.join("\n");
     }

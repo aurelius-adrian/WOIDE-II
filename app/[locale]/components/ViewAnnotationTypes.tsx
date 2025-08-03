@@ -18,6 +18,7 @@ import {
 } from "@fluentui/react-components";
 import { validateAnnotationTypes } from "./utils/AnnotationTypeValidation";
 import { enqueueSnackbar } from "notistack";
+import GlobalDocumentDataEditor from "./GlobalDocumentDataEditor";
 
 type ImportResolution = {
     [name: string]: "replace" | "skip";
@@ -32,6 +33,7 @@ export const ViewAnnotationTypes = ({
     const [importResolution, setImportResolution] = useState<ImportResolution>({});
     const [showResolutionDialog, setShowResolutionDialog] = useState(false);
     const [pendingImport, setPendingImport] = useState<AnnotationType[]>([]);
+    const [globalDocumentData, setGlobalDocumentData] = useState<{ [key: string]: string }>({});
     const officeReady = useOfficeReady();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const handleUploadClick = () => {
@@ -49,10 +51,11 @@ export const ViewAnnotationTypes = ({
                     [key: string]: string;
                 },
             );
+            setGlobalDocumentData((await getDocumentSetting("globalDocumentData")) ?? {});
         };
 
         if (officeReady) _getData();
-    }, [officeReady, setAnnotationTypes]);
+    }, [officeReady, setAnnotationTypes, setGlobalDocumentData]);
 
     const openDialog = () => {
         const url = new URL("/templating", window.origin);
@@ -62,6 +65,7 @@ export const ViewAnnotationTypes = ({
                 JSON.stringify({
                     formDescription: [],
                     exportData,
+                    globalDocumentData,
                 }),
             ),
         );
@@ -256,8 +260,19 @@ export const ViewAnnotationTypes = ({
     return (
         <div>
             <div className={"mb-2"}>Document Export Settings:</div>
-            <div className={"mb-4"}>
+            <div className={"mb-2"}>
                 <Button onClick={openDialog}>Edit Export Settings</Button>
+            </div>
+            <div className={"mb-4"}>
+                <GlobalDocumentDataEditor
+                    data={globalDocumentData}
+                    setData={async (value) => {
+                        const _value = value === "" ? {} : value;
+                        setGlobalDocumentData(_value);
+                        console.log(_value);
+                        await setDocumentSetting("globalDocumentData", _value);
+                    }}
+                />
             </div>
 
             <div className={"mb-2"}>Annotation Types:</div>
@@ -269,6 +284,7 @@ export const ViewAnnotationTypes = ({
                             formDescription: [],
                             name: "New Annotation Type",
                             exportData: {},
+                            color: "",
                         } as AnnotationType)
                     }
                 >

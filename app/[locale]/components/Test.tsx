@@ -1,9 +1,15 @@
 /* eslint-disable max-len */
-import { insertAnnotation } from "../../lib/annotation-api/annotations";
-import { highlightAnnotationID } from "../../lib/annotation-api/navigation";
+import { getAnnotations } from "../../lib/annotation-api/annotations";
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
-import { Export, saveStringToFile } from "../../lib/export-api/export";
+import { saveStringToFile } from "../../lib/export-api/export";
+import { getAllDocumentSettings, getAnnotationTypesAsDict } from "../../lib/settings-api/settings";
+import { AnnotationType } from "../../lib/utils/annotations";
+import { getAnnotationTextByID } from "../../lib/annotation-api/navigation";
+import { GetGlossary } from "../../lib/sniffy-api/glossary";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Mustache = require("mustache");
 
 const Test = () => {
     const dialog = useRef<Office.Dialog>();
@@ -23,21 +29,12 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         });
     };
 
-    const test_2 = () => {
-        insertAnnotation({
-            data: "",
-        }).then((r) => {
-            if (r !== null) highlightAnnotationID(r).then(() => {});
-        });
+    const test_2 = async () => {
+        console.log("glossary: ", await GetGlossary);
     };
 
     const test_3 = async () => {
-        Word.run(async (context) => {
-            const ccs = context.document.body.contentControls;
-            ccs.load();
-            await context.sync();
-            console.log(ccs.items);
-        });
+        console.log(await getAllDocumentSettings());
     };
 
     const test_4 = async () => {

@@ -17,6 +17,9 @@ import Test from "./Test";
 import { enqueueSnackbar } from "notistack";
 import { Annotation } from "../../lib/annotation-api/types";
 import { removeHighlightAnnotationID } from "../../lib/annotation-api/navigation";
+import { GetGlossary, GlossaryEntry } from "../../lib/sniffy-api/glossary";
+import { FindMatches, SniffyResult } from "../../lib/sniffy-api/sniff";
+import { AddFilled, EyeFilled } from "@fluentui/react-icons";
 
 interface AnnotationEditorProps {
     setEditMode: (v: boolean) => void;
@@ -36,7 +39,11 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const [selectedAnnotationType, setSelectedAnnotationType] = useState<AnnotationType | null>(null);
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
     const [annotationIndex, setAnnotationIndex] = useState<string>("defaultSelector");
-    const [editAnnotationData, setEditAnnotationData] = useState<any>(null);
+
+    //Sniffy Data
+    const [sniffyView, setSniffyView] = useState<boolean>(false);
+    const [glossary, setGlossary] = useState<{ [word: string]: any } | undefined>();
+    const [sniffyResult, setSniffyResult] = useState<SniffyResult[] | undefined>();
 
     const [isUpdatingRange, setIsUpdatingRange] = useState<boolean>(false);
 
@@ -50,25 +57,18 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
     useEffect(() => {
         if (editAnnotation) {
-            const filterdData = Object.fromEntries(
-                Object.entries(JSON.parse(editAnnotation.data ?? "{}")).filter(
-                    ([key]) => key !== "formDescription" && key !== "id",
-                ),
-            );
-            const { name, ...formDataSelectedAnnotation } = filterdData;
-            const indexToEdit = annotationTypes.findIndex((e) => e.name === name);
-            if (indexToEdit !== -1 && name !== "") {
+            const indexToEdit = annotationTypes.findIndex((e) => e.id === editAnnotation.annotationTypeId);
+            if (indexToEdit !== -1) {
                 setAnnotationIndex(indexToEdit.toString());
                 setSelectedAnnotationType(annotationTypes[indexToEdit]);
             }
-            setEditAnnotationData(formDataSelectedAnnotation);
         }
     }, [editAnnotation, annotationTypes]);
 
     useEffect(() => {
-        if (selectedAnnotationType && editAnnotationData !== null) {
+        if (selectedAnnotationType && editAnnotation !== null) {
             formRef.current?.update({
-                ...editAnnotationData,
+                ...editAnnotation?.data,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,14 +87,10 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 return;
             }
 
-            const annotationDetailedData = {
-                ...data,
-                ...selectedAnnotationType,
-                annotationTypeId: selectedAnnotationType?.id,
-            };
-
             await insertAnnotation({
-                data: JSON.stringify(annotationDetailedData),
+                data: { ...data },
+                annotationTypeId: selectedAnnotationType?.id,
+                color: selectedAnnotationType?.color,
             });
             enqueueSnackbar({
                 message: "Annotation Successfully Added.",
@@ -103,7 +99,8 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             });
             _getAnnotations();
             setEditMode(false);
-        } catch {
+        } catch (e) {
+            console.error(e);
             enqueueSnackbar({
                 message: "Select text and complete the form to add annotation.",
                 variant: "error",
@@ -124,14 +121,10 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 return;
             }
 
-            const annotationDetailedData = {
-                ...data,
-                ...selectedAnnotationType,
-                annotationTypeId: selectedAnnotationType?.id,
-            };
-
             await updateAnnotation(editAnnotation?.id ?? "", {
-                data: JSON.stringify(annotationDetailedData),
+                data: { ...data },
+                annotationTypeId: selectedAnnotationType?.id,
+                color: selectedAnnotationType?.color,
             });
             enqueueSnackbar({
                 message: "Annotation successfully updated.",
@@ -176,44 +169,54 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
         }
     };
 
-    return (
-        <div>
-            <label htmlFor={selectId}>Annotation Type</label>
-            <Select
-                value={annotationIndex}
-                id={selectId}
-                className={"mb-6"}
-                onChange={(e) => {
-                    formRef.current?.reset();
-                    const selectedId = e.target.value;
-                    const selected = annotationTypes[parseInt(selectedId)];
-                    setAnnotationIndex(String(selectedId));
-                    setSelectedAnnotationType(selected);
-                }}
-            >
-                <option disabled value="defaultSelector">
-                    Select an Annotation Type
-                </option>
-                {annotationTypes.map((e, idx) => (
-                    <option key={idx} value={idx}>
-                        {e.name}
+    const runSniffy = async () => {
+        const _glossary = await GetGlossary();
+        setGlossary(_glossary);
+
+        console.log("glossary: ", _glossary);
+        setSniffyResult(await FindMatches(_glossary));
+        setSniffyView(true);
+    };
+
+    const RenderEditor = () => {
+        return (
+            <div>
+                <label htmlFor={selectId}>Annotation Type</label>
+                <Select
+                    value={annotationIndex}
+                    id={selectId}
+                    className={"mb-6"}
+                    onChange={(e) => {
+                        formRef.current?.reset();
+                        const selectedId = e.target.value;
+                        const selected = annotationTypes[parseInt(selectedId)];
+                        setAnnotationIndex(String(selectedId));
+                        setSelectedAnnotationType(selected);
+                    }}
+                >
+                    <option disabled value="defaultSelector">
+                        Select an Annotation Type
                     </option>
-                ))}
-            </Select>
-
+                    {annotationTypes.map((e, idx) => (
+                        <option key={idx} value={idx}>
+                            {e.name}
+                        </option>
+                    ))}
+                </Select>
+    
             <div className={"mb-4"}>
-                <Form
-                    formDescription={selectedAnnotationType?.formDescription ?? []}
-                    ref={formRef}
-                    {...(editAnnotationData && { formData: { ...editAnnotationData } })}
-                />
-            </div>
-
+                    <Form
+                        formDescription={selectedAnnotationType?.formDescription ?? []}
+                        ref={formRef}
+                        formData={editAnnotation?.data}
+                    />
+                </div>
+    
             {editAnnotation ? (
-                <div className="space-y-2 ">
+                    <div className="space-y-2 ">
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                         <Button onClick={updateAnnotationData}>Update Annotation Data</Button>
-                        <Button
+                            <Button
                             onClick={updateAnnotationRangeHandler}
                             disabled={isUpdatingRange}
                             appearance="secondary"
@@ -226,12 +229,105 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                     </div>
                 </div>
             ) : (
-                <>
-                    <Button onClick={addAnnotation}>Add Annotation</Button>
-                    {process.env.NEXT_PUBLIC_DEV === "true" ? <Test /> : null}
-                </>
-            )}
-        </div>
+                    <>
+                        <div className={"flex flex-row space-x-2"}>
+                            <Button onClick={addAnnotation}>Add Annotation</Button>
+                            <Button
+                                onClick={() => {
+                                    if (!sniffyResult) runSniffy();
+                                    else setSniffyView(true);
+                                }}
+                            >
+                                Run Sniffy
+                            </Button>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    };
+
+    const annotateEntry = async (entry: GlossaryEntry, annotationType: AnnotationType, select: () => Promise<void>) => {
+        try {
+            await select();
+            await insertAnnotation({
+                data: entry.data,
+                annotationTypeId: annotationType.id,
+                color: annotationType.color,
+            });
+            enqueueSnackbar("Inserted Annotation", { variant: "success", autoHideDuration: 2000 });
+        } catch (e) {
+            console.error("failed to insert annotation: ", e);
+            enqueueSnackbar({
+                message: "Failed to insert annotation.",
+                variant: "error",
+                autoHideDuration: 5000,
+            });
+        }
+    };
+
+    const GlossaryEntry = ({ entry, select }: { entry: GlossaryEntry; select: () => Promise<void> }) => {
+        const annotationType = annotationTypes.find((e) => e.id === entry.refTypeId);
+
+        if (!annotationType) {
+            return <div className={"border-l-2 mb-1 text-red-500"}>Invalid Annotation Type!</div>;
+        }
+
+        return (
+            <div className={"border-l-2 mb-1"}>
+                <div className={"flex flex-row space-x-2 items-center"}>
+                    <Button
+                        icon={<AddFilled />}
+                        onClick={() => annotateEntry(entry, annotationType, select)}
+                        appearance={"transparent"}
+                    />
+                    {annotationType?.name || "Could not find reference annotation type."}
+                </div>
+                <div className={"ml-2"}>
+                    {Object.keys(entry.data).map((e, idx) => (
+                        <div key={idx}>
+                            {e}: {`${entry.data[e]}`}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+    const RenderSniffyResult = ({ result }: { result: SniffyResult }) => {
+        return (
+            <div className={"m-2 border-2 rounded p-1"}>
+                <div className={"flex flex-row space-x-2 items-center justify-between mb-2"}>
+                    <div className={"italic"}>{result.text}</div>
+                    <Button icon={<EyeFilled />} onClick={result.select} appearance={"transparent"} />
+                </div>
+                Annotate as:
+                {result.possibleAnnotations.map((e, idx) => (
+                    <GlossaryEntry entry={e} select={result.select} key={idx} />
+                ))}
+            </div>
+        );
+    };
+
+    const RenderSniffy = () => {
+        return (
+            <div>
+                <div className={"h-96 overflow-y-scroll mb-2"}>
+                    {sniffyResult?.map((e, idx) => <RenderSniffyResult key={idx} result={e} />)}
+                </div>
+                <div className={"flex flex-row space-x-2"}>
+                    <Button onClick={() => setSniffyView(false)}>Close</Button>
+                    <Button onClick={() => runSniffy()}>Refresh Results</Button>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <>
+            {sniffyView ? <RenderSniffy /> : <RenderEditor />}
+            {process.env.NEXT_PUBLIC_DEV === "true" ? <Test /> : null}
+        </>
     );
 };
 

@@ -62,7 +62,13 @@ export default function TaskPanePage() {
                         <div>{t("description")}</div>
                         <div>
                             {t("sub-desc1")}{" "}
-                            <a href={"https://github.com/aurelius-adrian/WOIDE-II"}>{t("sub-desc2")}</a>
+                            <a
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={"https://github.com/aurelius-adrian/WOIDE-II"}
+                            >
+                                {t("sub-desc2")}
+                            </a>
                         </div>
                     </AccordionPanel>
                 </AccordionItem>

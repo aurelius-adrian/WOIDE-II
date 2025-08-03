@@ -1,5 +1,6 @@
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
+import { AnnotationType } from "../utils/annotations";
 
 export const idSalt = "woideann_";
 
@@ -22,9 +23,12 @@ export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () =
             (e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"),
         );
         return list.map((e) => {
+            const _data = JSON.parse(e.title);
+
             return {
                 id: e.tag.slice(idSalt.length + 2),
-                data: e.title,
+                annotationTypeId: _data.annotationTypeId,
+                data: _data.data,
                 color: e.color,
             } as Annotation;
         });
@@ -38,9 +42,12 @@ export const getAnnotations: () => Promise<Annotation[]> = async () => {
         await context.sync();
         const list = ccs.items.filter((e) => e.tag && e.tag.includes(idSalt) && e.tag.includes("_s"));
         return list.map((e) => {
+            const _data = JSON.parse(e.title);
+
             return {
                 id: e.tag.slice(idSalt.length + 2),
-                data: e.title,
+                annotationTypeId: _data.annotationTypeId,
+                data: _data.data,
                 color: e.color,
             } as Annotation;
         });
@@ -78,28 +85,25 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         };
 
         const color = props.color ?? _randomHexColor();
+
         const startSymbol = props.startSymbol ?? "❭";
         const endSymbol = props.endSymbol ?? "❬";
 
-        start.insertText(" ", Word.InsertLocation.after);
-        const startSymbolRange = start.insertText(startSymbol, Word.InsertLocation.replace);
+        const startSymbolRange = start.insertText(startSymbol, Word.InsertLocation.before);
         const cc_s = startSymbolRange.insertContentControl();
         cc_s.appearance = Word.ContentControlAppearance.hidden;
         cc_s.tag = idSalt + "_s" + ret.id;
-        cc_s.title = props.data ?? "";
+        cc_s.title = JSON.stringify({ annotationTypeId: props.annotationTypeId, data: props.data });
+        cc_s.color = color;
         cc_s.font.color = color;
         cc_s.font.bold = true;
-        cc_s.cannotEdit = true;
 
-        end.insertText(" ", Word.InsertLocation.before);
-        const endSymbolRange = end.insertText(endSymbol, Word.InsertLocation.replace);
+        const endSymbolRange = end.insertText(endSymbol, Word.InsertLocation.after);
         const cc_e = endSymbolRange.insertContentControl();
-        cc_e.cannotEdit = false;
         cc_e.appearance = Word.ContentControlAppearance.hidden;
         cc_e.tag = idSalt + "_e" + ret.id;
         cc_e.font.color = color;
         cc_e.font.bold = true;
-        cc_e.cannotEdit = true;
 
         start.select(Word.SelectionMode.start);
         await context.sync();
@@ -117,9 +121,27 @@ export const updateAnnotation = async (
         contentControls.load();
         await context.sync();
 
-        const toUpdate = contentControls.items.filter((cc) => cc.tag === `${idSalt}_s${AnnotationToUpdateID}`);
-        toUpdate[0].cannotEdit = false;
-        toUpdate[0].title = props.data ?? "";
+        const toUpdateStart = contentControls.items.find((cc) => cc.tag === `${idSalt}_s${AnnotationToUpdateID}`);
+        const toUpdateEnd = contentControls.items.find((cc) => cc.tag === `${idSalt}_e${AnnotationToUpdateID}`);
+
+        if (!toUpdateStart || !toUpdateEnd) {
+            console.warn(`Could not find annotation with ID: ${AnnotationToUpdateID}`);
+            return;
+        }
+        toUpdateStart.cannotEdit = false;
+        toUpdateEnd.cannotEdit = false;
+
+        toUpdateStart.title = JSON.stringify({ annotationTypeId: props.annotationTypeId, data: props.data });
+
+        if (props.color) {
+            toUpdateStart.color = props.color;
+            toUpdateStart.font.color = props.color;
+            toUpdateEnd.font.color = props.color;
+        }
+
+        toUpdateStart.cannotEdit = true;
+        toUpdateEnd.cannotEdit = true;
+
         await context.sync();
     });
 };
@@ -223,7 +245,7 @@ export const updateAnnotationRange = async (annotationId: string, props: Annotat
 };
 
 export const _getAnnotationRange = (start: Word.Range, end: Word.Range): Word.Range => {
-    return start.expandTo(end);
+    return start.getRange(Word.RangeLocation.after).expandTo(end.getRange(Word.RangeLocation.start));
 };
 
 export const deleteAnnotation = async (annotationId: string): Promise<void> => {
@@ -255,3 +277,17 @@ export const deleteAnnotation = async (annotationId: string): Promise<void> => {
         await context.sync();
     });
 };
+
+export function getEmptyJSON(a: AnnotationType): any {
+    const ret: any = {};
+    for (const fe of a.formDescription) {
+        switch (fe.type) {
+            case "select":
+                ret[fe.id] = (fe.options?.map((o) => o.value) ?? []).join(" | ");
+                continue;
+            default:
+                ret[fe.id] = "";
+        }
+    }
+    return ret;
+}

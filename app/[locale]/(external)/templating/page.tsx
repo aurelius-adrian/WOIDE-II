@@ -6,18 +6,20 @@ import Form, { AnnotationFormApi } from "../../components/Form";
 import { ToggleButton } from "@fluentui/react-components";
 import { Select } from "@fluentui/react-select";
 import { useId } from "@fluentui/react-utilities";
-import { useOfficeReady } from "../../components/Setup";
+import { useDarkModeContext, useOfficeReady } from "../../components/Setup";
 import { AddRegular, DeleteRegular, SaveRegular } from "@fluentui/react-icons";
 import { Button } from "@fluentui/react-button";
 import { enqueueSnackbar } from "notistack";
 
-export default function Test() {
+export default function TemplateRenderer() {
     const officeReady = useOfficeReady();
     const searchParams = useSearchParams();
     const data = JSON.parse(atob(searchParams.get("data") || ""));
+    const { darkMode } = useDarkModeContext();
 
     const [_formData, _setFormData] = useState();
     const formData = {
+        ...(data.globalDocumentData || {}),
         ...(_formData || {}),
         getInnerHTML: () => "{inner HTML}",
         getChildrenEval: () => "{children eval}",
@@ -34,8 +36,10 @@ export default function Test() {
     const [isFormVisible, setIsFormVisible] = useState(true);
     const [isOutputVisible, setIsOutputVisible] = useState(true);
     const [isJsonVisible, setIsJsonVisible] = useState(true);
+    const [language, setLanguage] = useState<string>(data?.allowedMarkup?.length ? data?.allowedMarkup[0] : "html");
 
     const selectId = useId();
+    const selectId1 = useId();
 
     useEffect(() => {
         if (officeReady)
@@ -106,7 +110,13 @@ export default function Test() {
                         autoFocus
                     />
                 ) : (
-                    <Select id={selectId} value={selectedCodeKey} onChange={handleKeySelection} className={"flex-1"}>
+                    <Select
+                        id={selectId}
+                        value={selectedCodeKey}
+                        onChange={handleKeySelection}
+                        className={"flex-1"}
+                        disabled={data?.singleLayer}
+                    >
                         {Object.keys(exportLayers).map((key) => (
                             <option key={key} value={key}>
                                 {key}
@@ -114,28 +124,50 @@ export default function Test() {
                         ))}
                     </Select>
                 )}
-                <Button
-                    onClick={handleDeleteLayer}
-                    disabled={exportLayers[selectedCodeKey] === undefined && editingKeyValue === undefined}
-                    appearance="secondary"
-                    icon={editingKeyValue === undefined ? <DeleteRegular /> : undefined}
-                >
-                    {editingKeyValue === undefined ? "Delete" : "Cancel"}
-                </Button>
-                <Button
-                    onClick={addNewCodeState}
-                    appearance="primary"
-                    icon={editingKeyValue === undefined ? <AddRegular /> : undefined}
-                >
-                    {editingKeyValue === undefined ? "Add new Layer" : "Save"}
-                </Button>
+                {!data?.singleLayer && (
+                    <Button
+                        onClick={handleDeleteLayer}
+                        disabled={exportLayers[selectedCodeKey] === undefined && editingKeyValue === undefined}
+                        appearance="secondary"
+                        icon={editingKeyValue === undefined ? <DeleteRegular /> : undefined}
+                    >
+                        {editingKeyValue === undefined ? "Delete" : "Cancel"}
+                    </Button>
+                )}
+                {!data?.singleLayer && (
+                    <Button
+                        onClick={addNewCodeState}
+                        appearance="primary"
+                        icon={editingKeyValue === undefined ? <AddRegular /> : undefined}
+                    >
+                        {editingKeyValue === undefined ? "Add new Layer" : "Save"}
+                    </Button>
+                )}
             </div>
 
-            <div className={"h-96 border-blue-900 border-2 rounded-md py-2"}>
+            <div className={"h-96 border-blue-900 border-2 rounded-md pt-2 pb-10"}>
+                <Select
+                    id={selectId1}
+                    value={language}
+                    onChange={(e) => {
+                        setLanguage(e.target.value);
+                    }}
+                    className={"mb-2 px-2"}
+                >
+                    {(!data?.allowedMarkup || data.allowedMarkup.includes("html")) && (
+                        <option value={"html"}>HTML</option>
+                    )}
+                    {(!data?.allowedMarkup || data.allowedMarkup.includes("json")) && (
+                        <option value={"json"}>JSON</option>
+                    )}
+                    {(!data?.allowedMarkup || data.allowedMarkup.includes("typescript")) && (
+                        <option value={"typescript"}>typescript</option>
+                    )}
+                </Select>
                 <Editor
                     height="100%"
-                    language="html"
-                    theme="light"
+                    language={language}
+                    theme={darkMode ? "vs-dark" : "light"}
                     value={exportLayers[selectedCodeKey] || ""}
                     options={{
                         lineNumbers: "on",
@@ -179,11 +211,11 @@ export default function Test() {
                 {isJsonVisible && (
                     <div className={"border-blue-900 border-2 rounded-md p-2 flex-1"}>
                         <div className="mb-2">Available Keys/Test Values:</div>
-                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
-                            <code className="text-sm">{JSON.stringify(formData, null, 2)}</code>
+                        <pre className="bg-gray-100 dark:bg-black p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                            <code className="text-sm">{JSON.stringify(_formData, null, 2)}</code>
                         </pre>
                         <div className="my-2">Available Functions:</div>
-                        <pre className="bg-gray-100 p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                        <pre className="bg-gray-100 dark:bg-black p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
                             <code className="text-sm">
                                 {"getInnerHTML: Gets the HTML content within the annotation and evaluates all " +
                                     "children with the same layer key returning the export result." +
@@ -192,6 +224,14 @@ export default function Test() {
                                     "returning the export result."}
                             </code>
                         </pre>
+                        {data.globalDocumentData && (
+                            <>
+                                <div className="my-2">Global Document Data:</div>
+                                <pre className="bg-gray-100 dark:bg-black p-4 rounded-lg overflow-auto whitespace-pre-wrap break-words">
+                                    <code className="text-sm">{JSON.stringify(data.globalDocumentData, null, 2)}</code>
+                                </pre>
+                            </>
+                        )}
                     </div>
                 )}
             </div>

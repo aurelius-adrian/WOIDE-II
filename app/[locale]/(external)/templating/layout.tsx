@@ -21,7 +21,7 @@ export default async function RootLayout({
     const { locale } = params;
 
     return (
-        <html lang={locale} className={"h-full bg-light-bg dark:bg-dark-bg"}>
+        <html lang={locale} className={"h-full bg-light-bg dark:bg-dark-bg p-4"}>
             <body>
                 <NextIntlClientProvider messages={messages}>
                     <Setup>{children}</Setup>

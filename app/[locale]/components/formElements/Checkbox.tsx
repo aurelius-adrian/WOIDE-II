@@ -1,15 +1,13 @@
-import { useId } from "react";
 import { FormElementDescription } from "../Form";
 import { Controller, useFormContext } from "react-hook-form";
-import { Input, Label } from "@fluentui/react-components";
+import { Checkbox as _Checkbox } from "@fluentui/react-components";
 import { RequiredLabel } from "./ImportantFieldIndicator";
 
-interface TextInputProps {
+interface CheckboxProps {
     description: FormElementDescription;
 }
 
-export const TextInput = ({ description }: TextInputProps) => {
-    const id = useId();
+export const Checkbox = ({ description }: CheckboxProps) => {
     const { control } = useFormContext();
     return (
         <div>
@@ -21,10 +19,11 @@ export const TextInput = ({ description }: TextInputProps) => {
                 }}
                 render={({ field }) => (
                     <div className={"flex flex-col gap-0.5"}>
-                        <Label htmlFor={id} disabled={field.disabled}>
-                            <RequiredLabel required={description.required} label={description.label} />
-                        </Label>
-                        <Input id={id} type="text" {...field} value={field.value ?? ""} />
+                        <_Checkbox
+                            {...field}
+                            checked={field.value || false}
+                            label={<RequiredLabel required={description.required} label={description.label} />}
+                        />
                     </div>
                 )}
             />
@@ -32,4 +31,4 @@ export const TextInput = ({ description }: TextInputProps) => {
     );
 };
 
-export default TextInput;
+export default Checkbox;

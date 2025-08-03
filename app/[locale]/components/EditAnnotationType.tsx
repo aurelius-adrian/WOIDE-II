@@ -1,23 +1,44 @@
 import Form, { AnnotationFormApi } from "./Form";
 import { Button } from "@fluentui/react-button";
+import { Checkbox, Divider, Label } from "@fluentui/react-components";
 import { useEffect, useRef, useState } from "react";
 import { AnnotationType } from "../../lib/utils/annotations";
 import { getDocumentSetting, setDocumentSetting } from "../../lib/settings-api/settings";
 import { v4 } from "uuid";
 import { enqueueSnackbar } from "notistack";
+import { Select as SelectComponent } from "@fluentui/react-select";
+import { useOfficeReady } from "./Setup";
+import { getEmptyJSON } from "../../lib/annotation-api/annotations";
 
 export const EditAnnotationType = ({ annotationType }: { annotationType: AnnotationType }) => {
     const formApi = useRef<AnnotationFormApi>(null);
     const [tmpId, setTmpId] = useState<string | null>(null);
     const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>(annotationType.exportData);
+    const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
+    const [globalDocumentData, setGlobalDocumentData] = useState<{ [key: string]: string }>({});
+    const [selectedReferenceAnnotationTypeId, setSelectedReferenceAnnotationTypeId] = useState<string>(
+        annotationType.referenceAnnotationTypeId ?? "",
+    );
+    const [enableSniffy, setEnableSniffy] = useState<boolean>(annotationType.enableSniffy ?? false);
+    const [dataTemplateData, setDataTemplateData] = useState<undefined | string>(annotationType.referenceDataTemplate);
+    const officeReady = useOfficeReady();
 
     const dialog = useRef<Office.Dialog>();
+
+    useEffect(() => {
+        const _getData = async () => {
+            setAnnotationTypes(((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[]);
+            setGlobalDocumentData((await getDocumentSetting("globalDocumentData")) ?? {});
+        };
+
+        if (officeReady) _getData();
+    }, [officeReady, setAnnotationTypes]);
 
     useEffect(() => {
         setTmpId(annotationType.id ?? v4());
     }, [annotationType]);
 
-    const saveAnnotationType = async (_exportData?: unknown) => {
+    const saveAnnotationType = async (_exportData?: unknown, _dataTemplateData?: unknown) => {
         try {
             const data = await formApi.current?.submit();
             const hasMissingId =
@@ -41,6 +62,10 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                         ...data,
                         exportData: _exportData || exportData,
                         id: tmpId,
+                        enableSniffy: enableSniffy,
+                        referenceAnnotationTypeId:
+                            selectedReferenceAnnotationTypeId === "" ? undefined : selectedReferenceAnnotationTypeId,
+                        referenceDataTemplate: _dataTemplateData || dataTemplateData,
                     } as AnnotationType),
                 );
             } else {
@@ -50,6 +75,10 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                         ...data,
                         exportData: _exportData || exportData,
                         id: tmpId,
+                        enableSniffy: enableSniffy,
+                        referenceAnnotationTypeId:
+                            selectedReferenceAnnotationTypeId === "" ? undefined : selectedReferenceAnnotationTypeId,
+                        referenceDataTemplate: _dataTemplateData || dataTemplateData,
                     },
                 ]);
             }
@@ -89,7 +118,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
         }
     };
 
-    function processMessage(arg: any) {
+    function processExportDataMessage(arg: any) {
         try {
             const data = JSON.parse(arg.message);
             setExportData(data);
@@ -102,7 +131,20 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
         dialog.current?.messageChild("success");
     }
 
-    const openDialog = () => {
+    function processDataTemplateDataMessage(arg: any) {
+        try {
+            const data = JSON.parse(arg.message)?.default;
+            setDataTemplateData(data);
+            saveAnnotationType(undefined, data);
+        } catch (e) {
+            console.error("could not parse/save export template data: ", e);
+            dialog.current?.messageChild("error");
+            return;
+        }
+        dialog.current?.messageChild("success");
+    }
+
+    const openExportSettingDialog = () => {
         const url = new URL("/templating", window.origin);
         url.searchParams.append(
             "data",
@@ -110,6 +152,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 JSON.stringify({
                     ...formApi.current?.getFormData(),
                     exportData,
+                    globalDocumentData,
                 }),
             ),
         );
@@ -123,7 +166,52 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
             },
             (res) => {
                 dialog.current = res.value;
-                dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processMessage);
+                dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processExportDataMessage);
+            },
+        );
+    };
+
+    const openReferenceSettingDialog = () => {
+        if (selectedReferenceAnnotationTypeId === "") {
+            enqueueSnackbar("Select a reference annotation type first.", { variant: "error", autoHideDuration: 5000 });
+            return;
+        }
+
+        const aT = annotationTypes.find((e) => e.id === selectedReferenceAnnotationTypeId);
+        if (!aT) {
+            enqueueSnackbar("Select a valid reference annotation type first.", {
+                variant: "error",
+                autoHideDuration: 5000,
+            });
+            return;
+        }
+
+        const url = new URL("/templating", window.origin);
+        url.searchParams.append(
+            "data",
+            btoa(
+                JSON.stringify({
+                    ...formApi.current?.getFormData(),
+                    exportData: {
+                        default: dataTemplateData || JSON.stringify(getEmptyJSON(aT)),
+                    },
+                    globalDocumentData,
+                    singleLayer: true,
+                    allowedMarkup: ["json"],
+                }),
+            ),
+        );
+
+        Office.context.ui.displayDialogAsync(
+            url.href,
+            {
+                height: 80,
+                width: 80,
+                displayInIframe: false,
+            },
+            (res) => {
+                dialog.current = res.value;
+                dialog.current.addEventHandler(Office.EventType.DialogMessageReceived, processDataTemplateDataMessage);
             },
         );
     };
@@ -146,13 +234,53 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                             label: "Form Description",
                             required: true,
                         },
+                        {
+                            id: "color",
+                            type: "colorPicker",
+                            label: "Annotation Type Color",
+                            required: true,
+                        },
                     ]}
-                    formData={annotationType}
+                    formData={annotationType as Omit<AnnotationType, "enableSniffy">}
                 />
             </div>
             <div>
-                <Button onClick={openDialog}>Edit Export Settings</Button>
+                <Button onClick={openExportSettingDialog}>Edit Export Settings</Button>
             </div>
+            <Divider />
+            <div>
+                <Checkbox
+                    label="Enable Sniffy"
+                    checked={enableSniffy}
+                    onChange={(e, data) => {
+                        setEnableSniffy(!!data.checked);
+                    }}
+                />
+                <div className={"flex flex-col gap-0.5 mb-2"}>
+                    <Label htmlFor={"referenceAnnotationTypeIdSelect"} disabled={false}>
+                        Select Reference Annotation Type:
+                    </Label>
+                    <SelectComponent
+                        id={"referenceAnnotationTypeIdSelect"}
+                        onChange={(e) => setSelectedReferenceAnnotationTypeId(e.target.value)}
+                        value={selectedReferenceAnnotationTypeId}
+                        disabled={false}
+                    >
+                        <option disabled value={""}>
+                            No Selection
+                        </option>
+                        {annotationTypes.map((e, idx) => (
+                            <option key={idx} value={e.id}>
+                                {e.name}
+                            </option>
+                        ))}
+                    </SelectComponent>
+                </div>
+                <div>
+                    <Button onClick={openReferenceSettingDialog}>Edit Reference Default Data</Button>
+                </div>
+            </div>
+            <Divider />
             <div className={"flex flex-row space-x-2"}>
                 <Button onClick={() => saveAnnotationType()}>Save Annotation Type</Button>
                 <Button onClick={deleteAnnotationType}>Delete Annotation Type</Button>
