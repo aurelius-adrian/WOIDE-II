@@ -102,6 +102,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         const cc_e = endSymbolRange.insertContentControl();
         cc_e.appearance = Word.ContentControlAppearance.hidden;
         cc_e.tag = idSalt + "_e" + ret.id;
+        cc_e.color = color;
         cc_e.font.color = color;
         cc_e.font.bold = true;
 
@@ -157,7 +158,7 @@ export const updateAnnotationRange = async (annotationId: string, props: Annotat
         }
 
         const contentControls = context.document.contentControls;
-        contentControls.load("tag, title, font/color, cannotEdit");
+        contentControls.load("tag, title, color");
         await context.sync();
 
         const startTag = `${idSalt}_s${annotationId}`;
@@ -176,42 +177,16 @@ export const updateAnnotationRange = async (annotationId: string, props: Annotat
         }
 
         startCC.load();
-        endCC.load();
         await context.sync();
-
-        const fullRange = startCC.getRange("After").expandTo(endCC.getRange("Before"));
-        fullRange.load();
-        await context.sync();
-
-        fullRange.font.load("color");
-        await context.sync();
-
-
-        const fullText = fullRange.text;
-        const cleanedText = fullText.trim();
-        
-        const textColor = fullRange.font.color;
-        
 
         const existingData = startCC.title;
-        const existingColor = startCC.font.color;
+        const existingColor = startCC.color;
 
         const splitRanges = selection.getRange().split([], true, false, true);
         const newRange = splitRanges.getFirst();
         const newStart: Word.Range = newRange.getRange(Word.RangeLocation.start);
         const newEnd: Word.Range = newRange.getRange(Word.RangeLocation.end);
 
-        startCC.cannotEdit = false;
-        endCC.cannotEdit = false;
-        startCC.font.color = textColor;
-        startCC.font.bold = false;
-        endCC.font.color = textColor;
-        endCC.font.bold = false;
-        await context.sync();
-
-        fullRange.insertText(cleanedText, Word.InsertLocation.replace);
-        await context.sync();
-        
         startCC.delete(false);
         endCC.delete(false);
         await context.sync();
@@ -220,24 +195,22 @@ export const updateAnnotationRange = async (annotationId: string, props: Annotat
         const startSymbol = props.startSymbol ?? "❭";
         const endSymbol = props.endSymbol ?? "❬";
 
-        newStart.insertText(" ", Word.InsertLocation.after);
-        const startSymbolRange = newStart.insertText(startSymbol, Word.InsertLocation.replace);
+        const startSymbolRange = newStart.insertText(startSymbol, Word.InsertLocation.before);
         const new_cc_s = startSymbolRange.insertContentControl();
         new_cc_s.appearance = Word.ContentControlAppearance.hidden;
         new_cc_s.tag = startTag;
         new_cc_s.title = existingData;
+        new_cc_s.color = color;
         new_cc_s.font.color = color;
         new_cc_s.font.bold = true;
-        new_cc_s.cannotEdit = true;
 
-        newEnd.insertText(" ", Word.InsertLocation.before);
-        const endSymbolRange = newEnd.insertText(endSymbol, Word.InsertLocation.replace);
+        const endSymbolRange = newEnd.insertText(endSymbol, Word.InsertLocation.after);
         const new_cc_e = endSymbolRange.insertContentControl();
         new_cc_e.appearance = Word.ContentControlAppearance.hidden;
         new_cc_e.tag = endTag;
+        new_cc_e.color = color;
         new_cc_e.font.color = color;
         new_cc_e.font.bold = true;
-        new_cc_e.cannotEdit = true;
 
         newStart.select(Word.SelectionMode.start);
         await context.sync();

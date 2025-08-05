@@ -1,4 +1,3 @@
-"use client";
 import { Select } from "@fluentui/react-select";
 import { Button } from "@fluentui/react-button";
 import {
@@ -147,6 +146,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
     const updateAnnotationRangeHandler = async () => {
         if (!editAnnotation?.id) return;
+        await removeHighlightAnnotationID(editAnnotation?.id);
 
         setIsUpdatingRange(true);
         try {
@@ -162,7 +162,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
             enqueueSnackbar({
                 message: "Failed to update annotation range. Please select text first.",
                 variant: "error",
-                autoHideDuration: 3000,
+                autoHideDuration: 5000,
             });
         } finally {
             setIsUpdatingRange(false);
@@ -203,32 +203,31 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                         </option>
                     ))}
                 </Select>
-    
-            <div className={"mb-4"}>
+                <div className={"mb-4"}>
                     <Form
                         formDescription={selectedAnnotationType?.formDescription ?? []}
                         ref={formRef}
                         formData={editAnnotation?.data}
                     />
                 </div>
-    
-            {editAnnotation ? (
+
+                {editAnnotation ? (
                     <div className="space-y-2 ">
-                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                        <Button onClick={updateAnnotationData}>Update Annotation Data</Button>
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                            <Button onClick={updateAnnotationData}>Update Annotation Data</Button>
                             <Button
-                            onClick={updateAnnotationRangeHandler}
-                            disabled={isUpdatingRange}
-                            appearance="secondary"
-                        >
-                            {isUpdatingRange ? "Updating Range..." : "Update Annotation Range"}
-                        </Button>
+                                onClick={updateAnnotationRangeHandler}
+                                disabled={isUpdatingRange}
+                                appearance="secondary"
+                            >
+                                {isUpdatingRange ? "Updating Range..." : "Update Annotation Range"}
+                            </Button>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                            To update the range, select the new text in the document and click Update Annotation Range
+                        </div>
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">
-                        To update the range, select the new text in the document and click Update Annotation Range
-                    </div>
-                </div>
-            ) : (
+                ) : (
                     <>
                         <div className={"flex flex-row space-x-2"}>
                             <Button onClick={addAnnotation}>Add Annotation</Button>
