@@ -16,8 +16,8 @@ import Test from "./Test";
 import { enqueueSnackbar } from "notistack";
 import { Annotation } from "../../lib/annotation-api/types";
 import { removeHighlightAnnotationID } from "../../lib/annotation-api/navigation";
-import { GetGlossary, GlossaryEntry } from "../../lib/sniffy-api/glossary";
-import { FindMatches, SniffyResult } from "../../lib/sniffy-api/sniff";
+import { CatalogEntry, GetInternalCatalog, GlossaryEntry, ReferenceEntry } from "../../lib/snify-api/catalog";
+import { FindMatches, SniffyResult } from "../../lib/snify-api/snify";
 import { AddFilled, EyeFilled } from "@fluentui/react-icons";
 
 interface AnnotationEditorProps {
@@ -170,7 +170,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     };
 
     const runSniffy = async () => {
-        const _glossary = await GetGlossary();
+        const _glossary = await GetInternalCatalog();
         setGlossary(_glossary);
 
         console.log("glossary: ", _glossary);
@@ -246,7 +246,11 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
         );
     };
 
-    const annotateEntry = async (entry: GlossaryEntry, annotationType: AnnotationType, select: () => Promise<void>) => {
+    const annotateEntry = async (
+        entry: ReferenceEntry,
+        annotationType: AnnotationType,
+        select: () => Promise<void>,
+    ) => {
         try {
             await select();
             await insertAnnotation({
@@ -265,7 +269,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
         }
     };
 
-    const GlossaryEntry = ({ entry, select }: { entry: GlossaryEntry; select: () => Promise<void> }) => {
+    const CatalogEntry = ({ entry, select }: { entry: ReferenceEntry; select: () => Promise<void> }) => {
         const annotationType = annotationTypes.find((e) => e.id === entry.refTypeId);
 
         if (!annotationType) {
@@ -302,7 +306,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 </div>
                 Annotate as:
                 {result.possibleAnnotations.map((e, idx) => (
-                    <GlossaryEntry entry={e} select={result.select} key={idx} />
+                    <CatalogEntry entry={e} select={result.select} key={idx} />
                 ))}
             </div>
         );

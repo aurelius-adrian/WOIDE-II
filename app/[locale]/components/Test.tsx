@@ -1,12 +1,10 @@
 /* eslint-disable max-len */
-import { getAnnotations } from "../../lib/annotation-api/annotations";
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
 import { saveStringToFile } from "../../lib/export-api/export";
-import { getAllDocumentSettings, getAnnotationTypesAsDict } from "../../lib/settings-api/settings";
-import { AnnotationType } from "../../lib/utils/annotations";
-import { getAnnotationTextByID } from "../../lib/annotation-api/navigation";
-import { GetGlossary } from "../../lib/sniffy-api/glossary";
+import { getAllDocumentSettings } from "../../lib/settings-api/settings";
+import { GetInternalCatalog } from "../../lib/snify-api/catalog";
+import { FindMatches } from "../../lib/snify-api/snify";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Mustache = require("mustache");
@@ -30,7 +28,20 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     };
 
     const test_2 = async () => {
-        console.log("glossary: ", await GetGlossary);
+        const catalog = await GetInternalCatalog();
+        console.log("catalog: ", catalog);
+
+        console.log(await FindMatches(catalog));
+
+        // Word.run(async (context) => {
+        //     const doc = context.document.body.getRange(Word.RangeLocation.whole).split([" "], undefined, true);
+        //     doc.load("items");
+        //     await context.sync();
+        //
+        //     for (const item of doc.items) {
+        //         console.log(item.text);
+        //     }
+        // });
     };
 
     const test_3 = async () => {
@@ -44,10 +55,6 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
             saveStringToFile(html.value, "test.html", "text/html");
         });
     };
-
-    function processMessage(arg: any) {
-        dialog.current?.close();
-    }
 
     return (
         <div className={"rounded-lg border-red-700 border-2 p-2 mt-4 space-y-2"}>
