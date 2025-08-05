@@ -39,7 +39,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
     const [annotationIndex, setAnnotationIndex] = useState<string>("defaultSelector");
 
-    //Sniffy Data
+    //Snify Data
     const [sniffyView, setSniffyView] = useState<boolean>(false);
     const [glossary, setGlossary] = useState<{ [word: string]: any } | undefined>();
     const [sniffyResult, setSniffyResult] = useState<SniffyResult[] | undefined>();
@@ -237,7 +237,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                                     else setSniffyView(true);
                                 }}
                             >
-                                Run Sniffy
+                                Run Snify
                             </Button>
                         </div>
                     </>

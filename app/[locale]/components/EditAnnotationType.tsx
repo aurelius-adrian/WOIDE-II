@@ -250,7 +250,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
             <Divider />
             <div>
                 <Checkbox
-                    label="Enable Sniffy"
+                    label="Enable Snify"
                     checked={enableSniffy}
                     onChange={(e, data) => {
                         setEnableSniffy(!!data.checked);
