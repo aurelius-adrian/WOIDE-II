@@ -1,7 +1,11 @@
-"use client";
 import { Select } from "@fluentui/react-select";
 import { Button } from "@fluentui/react-button";
-import { getAnnotations, insertAnnotation, updateAnnotation } from "../../lib/annotation-api/annotations";
+import {
+    getAnnotations,
+    insertAnnotation,
+    updateAnnotation,
+    updateAnnotationRange,
+} from "../../lib/annotation-api/annotations";
 import React, { useEffect, useRef, useState } from "react";
 import Form, { AnnotationFormApi } from "./Form";
 import { useId } from "@fluentui/react-utilities";
@@ -26,6 +30,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const _getAnnotations = async () => {
         await getAnnotations().then((ann) => updateAnnotations(ann));
     };
+
     const selectId = useId();
     const officeReady = useOfficeReady();
 
@@ -38,6 +43,8 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     const [sniffyView, setSniffyView] = useState<boolean>(false);
     const [glossary, setGlossary] = useState<{ [word: string]: any } | undefined>();
     const [sniffyResult, setSniffyResult] = useState<SniffyResult[] | undefined>();
+
+    const [isUpdatingRange, setIsUpdatingRange] = useState<boolean>(false);
 
     useEffect(() => {
         const _getData = async () => {
@@ -137,6 +144,31 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
         }
     };
 
+    const updateAnnotationRangeHandler = async () => {
+        if (!editAnnotation?.id) return;
+        await removeHighlightAnnotationID(editAnnotation?.id);
+
+        setIsUpdatingRange(true);
+        try {
+            await updateAnnotationRange(editAnnotation.id);
+            enqueueSnackbar({
+                message: "Annotation range successfully updated.",
+                variant: "success",
+                autoHideDuration: 2000,
+            });
+            _getAnnotations();
+        } catch (error) {
+            console.error("Failed to update annotation range:", error);
+            enqueueSnackbar({
+                message: "Failed to update annotation range. Please select text first.",
+                variant: "error",
+                autoHideDuration: 5000,
+            });
+        } finally {
+            setIsUpdatingRange(false);
+        }
+    };
+
     const runSniffy = async () => {
         const _glossary = await GetGlossary();
         setGlossary(_glossary);
@@ -178,8 +210,23 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                         formData={editAnnotation?.data}
                     />
                 </div>
+
                 {editAnnotation ? (
-                    <Button onClick={updateAnnotationData}>Update Annotation</Button>
+                    <div className="space-y-2 ">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                            <Button onClick={updateAnnotationData}>Update Annotation Data</Button>
+                            <Button
+                                onClick={updateAnnotationRangeHandler}
+                                disabled={isUpdatingRange}
+                                appearance="secondary"
+                            >
+                                {isUpdatingRange ? "Updating Range..." : "Update Annotation Range"}
+                            </Button>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                            To update the range, select the new text in the document and click Update Annotation Range
+                        </div>
+                    </div>
                 ) : (
                     <>
                         <div className={"flex flex-row space-x-2"}>

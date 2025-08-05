@@ -102,6 +102,7 @@ export const insertAnnotation = async (props: AnnotationProperties = {}): Promis
         const cc_e = endSymbolRange.insertContentControl();
         cc_e.appearance = Word.ContentControlAppearance.hidden;
         cc_e.tag = idSalt + "_e" + ret.id;
+        cc_e.color = color;
         cc_e.font.color = color;
         cc_e.font.bold = true;
 
@@ -142,6 +143,76 @@ export const updateAnnotation = async (
         toUpdateStart.cannotEdit = true;
         toUpdateEnd.cannotEdit = true;
 
+        await context.sync();
+    });
+};
+
+export const updateAnnotationRange = async (annotationId: string, props: AnnotationProperties = {}): Promise<void> => {
+    await Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        selection.load("text");
+        await context.sync();
+
+        if (!selection.text || selection.text.trim() === "") {
+            throw new Error("Please select text before updating annotation range");
+        }
+
+        const contentControls = context.document.contentControls;
+        contentControls.load("tag, title, color");
+        await context.sync();
+
+        const startTag = `${idSalt}_s${annotationId}`;
+        const endTag = `${idSalt}_e${annotationId}`;
+
+        const startCC = contentControls.items.find((cc) => cc.tag === startTag);
+        const endCC = contentControls.items.find((cc) => cc.tag === endTag);
+
+        if (!startCC || !endCC) {
+            console.error(
+                "Available tags:",
+                contentControls.items.map((cc) => cc.tag),
+            );
+            console.error("Looking for:", startTag, endTag);
+            throw new Error("Annotation not found.");
+        }
+
+        startCC.load();
+        await context.sync();
+
+        const existingData = startCC.title;
+        const existingColor = startCC.color;
+
+        const splitRanges = selection.getRange().split([], true, false, true);
+        const newRange = splitRanges.getFirst();
+        const newStart: Word.Range = newRange.getRange(Word.RangeLocation.start);
+        const newEnd: Word.Range = newRange.getRange(Word.RangeLocation.end);
+
+        startCC.delete(false);
+        endCC.delete(false);
+        await context.sync();
+
+        const color = existingColor;
+        const startSymbol = props.startSymbol ?? "❭";
+        const endSymbol = props.endSymbol ?? "❬";
+
+        const startSymbolRange = newStart.insertText(startSymbol, Word.InsertLocation.before);
+        const new_cc_s = startSymbolRange.insertContentControl();
+        new_cc_s.appearance = Word.ContentControlAppearance.hidden;
+        new_cc_s.tag = startTag;
+        new_cc_s.title = existingData;
+        new_cc_s.color = color;
+        new_cc_s.font.color = color;
+        new_cc_s.font.bold = true;
+
+        const endSymbolRange = newEnd.insertText(endSymbol, Word.InsertLocation.after);
+        const new_cc_e = endSymbolRange.insertContentControl();
+        new_cc_e.appearance = Word.ContentControlAppearance.hidden;
+        new_cc_e.tag = endTag;
+        new_cc_e.color = color;
+        new_cc_e.font.color = color;
+        new_cc_e.font.bold = true;
+
+        newStart.select(Word.SelectionMode.start);
         await context.sync();
     });
 };
