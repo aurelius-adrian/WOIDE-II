@@ -19,6 +19,7 @@ import {
 import { validateAnnotationTypes } from "./utils/AnnotationTypeValidation";
 import { enqueueSnackbar } from "notistack";
 import GlobalDocumentDataEditor from "./GlobalDocumentDataEditor";
+import ImportCatalogDialog from "./ImportCatalogDialog";
 
 type ImportResolution = {
     [name: string]: "replace" | "skip";
@@ -42,6 +43,8 @@ export const ViewAnnotationTypes = ({
 
     const dialog = useRef<Office.Dialog>();
     const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>();
+
+    const [showImportCatalogDialog, setShowImportCatalogDialog] = useState(false);
 
     useEffect(() => {
         const _getData = async () => {
@@ -257,8 +260,14 @@ export const ViewAnnotationTypes = ({
         });
     };
 
-    return (
+    return showImportCatalogDialog ? (
+        <ImportCatalogDialog
+            open={showImportCatalogDialog}
+            onOpenChange={() => setShowImportCatalogDialog(!showImportCatalogDialog)}
+        />
+    ) : (
         <div>
+            <div className={"text-xl font-bold"}>Settings</div>
             <div className={"mb-2"}>Document Export Settings:</div>
             <div className={"mb-2"}>
                 <Button onClick={openDialog}>Edit Export Settings</Button>
@@ -273,6 +282,11 @@ export const ViewAnnotationTypes = ({
                         await setDocumentSetting("globalDocumentData", _value);
                     }}
                 />
+            </div>
+
+            <div className={"mb-2"}>snify Catalogs:</div>
+            <div className={"mb-2"}>
+                <Button onClick={() => setShowImportCatalogDialog(true)}>Manage/Import External Catalog</Button>
             </div>
 
             <div className={"mb-2"}>Annotation Types:</div>
@@ -305,7 +319,6 @@ export const ViewAnnotationTypes = ({
                     style={{ display: "none" }}
                 />
             </div>
-
             <Dialog open={showResolutionDialog} onOpenChange={(_, data) => setShowResolutionDialog(data.open)}>
                 <DialogSurface>
                     <DialogBody>

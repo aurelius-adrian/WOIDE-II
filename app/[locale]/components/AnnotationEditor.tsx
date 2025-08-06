@@ -16,7 +16,13 @@ import Test from "./Test";
 import { enqueueSnackbar } from "notistack";
 import { Annotation } from "../../lib/annotation-api/types";
 import { removeHighlightAnnotationID } from "../../lib/annotation-api/navigation";
-import { CatalogEntry, GetInternalCatalog, GlossaryEntry, ReferenceEntry } from "../../lib/snify-api/catalog";
+import {
+    CatalogEntry,
+    GetGlobalCatalog,
+    GetInternalCatalog,
+    GlossaryEntry,
+    ReferenceEntry,
+} from "../../lib/snify-api/catalog";
 import { FindMatches, SniffyResult } from "../../lib/snify-api/snify";
 import { AddFilled, EyeFilled } from "@fluentui/react-icons";
 
@@ -41,7 +47,6 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
 
     //Snify Data
     const [sniffyView, setSniffyView] = useState<boolean>(false);
-    const [glossary, setGlossary] = useState<{ [word: string]: any } | undefined>();
     const [sniffyResult, setSniffyResult] = useState<SniffyResult[] | undefined>();
 
     const [isUpdatingRange, setIsUpdatingRange] = useState<boolean>(false);
@@ -170,11 +175,9 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     };
 
     const runSniffy = async () => {
-        const _glossary = await GetInternalCatalog();
-        setGlossary(_glossary);
-
-        console.log("glossary: ", _glossary);
-        setSniffyResult(await FindMatches(_glossary));
+        const internal = await GetInternalCatalog();
+        const global = await GetGlobalCatalog(internal);
+        setSniffyResult(await FindMatches(global));
         setSniffyView(true);
     };
 

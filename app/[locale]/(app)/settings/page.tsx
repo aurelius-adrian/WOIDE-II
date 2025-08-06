@@ -12,9 +12,9 @@ export default function SettingsPage() {
 
     return (
         <>
-            <div className={"text-xl font-bold"}>Settings</div>
             {annotationType ? (
                 <>
+                    <div className={"text-xl font-bold"}>Edit Annotation Type</div>
                     <div className={"-mb-3 -ml-3"}>
                         <Button
                             appearance={"transparent"}

@@ -2,9 +2,12 @@
 import { Button } from "@fluentui/react-button";
 import React, { useRef } from "react";
 import { saveStringToFile } from "../../lib/export-api/export";
-import { getAllDocumentSettings } from "../../lib/settings-api/settings";
+import { getAllDocumentSettings, setDocumentSetting } from "../../lib/settings-api/settings";
 import { GetInternalCatalog } from "../../lib/snify-api/catalog";
 import { FindMatches } from "../../lib/snify-api/snify";
+import { validateAnnotationTypes } from "./utils/AnnotationTypeValidation";
+import { v4 } from "uuid";
+import { enqueueSnackbar } from "notistack";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Mustache = require("mustache");
@@ -28,20 +31,14 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
     };
 
     const test_2 = async () => {
-        const catalog = await GetInternalCatalog();
-        console.log("catalog: ", catalog);
-
-        console.log(await FindMatches(catalog));
-
-        // Word.run(async (context) => {
-        //     const doc = context.document.body.getRange(Word.RangeLocation.whole).split([" "], undefined, true);
-        //     doc.load("items");
-        //     await context.sync();
-        //
-        //     for (const item of doc.items) {
-        //         console.log(item.text);
-        //     }
-        // });
+        Word.run(async (context) => {
+            const ccs = context.document.contentControls;
+            ccs.load("items");
+            await context.sync();
+            for (const cc of ccs.items) {
+                console.log("found: ", cc.id, cc);
+            }
+        });
     };
 
     const test_3 = async () => {
@@ -52,9 +49,18 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
         Word.run(async (context) => {
             const html = context.document.body.getRange().getHtml();
             await context.sync();
-            saveStringToFile(html.value, "test.html", "text/html");
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html.value, "text/html");
+
+            // Example: Query and log all htmlCCs
+            const htmlCCs = doc.getElementsByClassName("ContentControl");
+            for (const cc of htmlCCs) {
+                console.log("found:", cc.outerHTML);
+            }
         });
     };
+
+    const test_5 = async () => {};
 
     return (
         <div className={"rounded-lg border-red-700 border-2 p-2 mt-4 space-y-2"}>
@@ -64,6 +70,7 @@ Für die Untersuchung wurden zwei Pflanzenarten, Arabidopsis thaliana und Zea ma
                 <Button onClick={() => test_2()}>Test 2</Button>
                 <Button onClick={() => test_3()}>Test 3</Button>
                 <Button onClick={() => test_4()}>Test 4</Button>
+                <Button onClick={() => test_5()}>Test 5</Button>
             </div>
             <div className={"font-bold text-xl text-red-700"}>Output</div>
             <div id={"output"} />

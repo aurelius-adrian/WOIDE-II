@@ -17,7 +17,7 @@ export default function TemplateRenderer() {
     const data = JSON.parse(atob(searchParams.get("data") || ""));
     const { darkMode } = useDarkModeContext();
 
-    const [_formData, _setFormData] = useState();
+    const [_formData, _setFormData] = useState(data.initData);
     const formData = {
         ...(data.globalDocumentData || {}),
         ...(_formData || {}),
