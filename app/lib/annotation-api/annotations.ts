@@ -4,6 +4,51 @@ import { AnnotationType } from "../utils/annotations";
 
 export const idSalt = "woideann_";
 
+let annotationsVisible = true;
+const originalTagTexts = new Map<string, string>();
+
+export const toggleAnnotationsVisibility = async (): Promise<void> => {
+    return await Word.run(async (context) => {
+        const contentControls = context.document.contentControls;
+        contentControls.load();
+        await context.sync();
+
+        const annotationControls = contentControls.items.filter(
+            (cc) => cc.tag && cc.tag.includes(idSalt) && (cc.tag.includes("_s") || cc.tag.includes("_e"))
+        );
+
+        annotationsVisible = !annotationsVisible;
+
+        for (const cc of annotationControls) {
+            if (annotationsVisible) {
+                const originalText = originalTagTexts.get(cc.tag);
+                if (originalText) {
+                    cc.cannotEdit = false;
+                    cc.appearance = Word.ContentControlAppearance.hidden;
+                    cc.insertText(originalText, Word.InsertLocation.replace);
+                    cc.font.color = cc.color;
+                    cc.font.bold = true;
+                    cc.cannotEdit = true;
+                    originalTagTexts.delete(cc.tag);
+                }
+            } else {
+                if (!originalTagTexts.has(cc.tag)) {
+                    originalTagTexts.set(cc.tag, cc.text);
+                }
+                cc.cannotEdit = false;
+                cc.insertText("", Word.InsertLocation.replace);
+                cc.cannotEdit = true;
+            }
+        }
+
+        await context.sync();
+    });
+};
+
+export const areAnnotationsVisible = (): boolean => {
+    return annotationsVisible;
+};
+
 const _randomHexColor = () => {
     const hexChars = "0123456789ABCDEF";
     let color = "#";

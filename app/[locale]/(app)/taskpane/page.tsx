@@ -1,9 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Accordion, AccordionHeader, AccordionItem, AccordionPanel } from "@fluentui/react-accordion";
-import { EditRegular, EyeFilled, InfoRegular } from "@fluentui/react-icons";
+import { EditRegular, EyeFilled, InfoRegular, EyeOffRegular } from "@fluentui/react-icons";
 import { Button } from "@fluentui/react-button";
-import { getAnnotations } from "../../../lib/annotation-api/annotations";
+// eslint-disable-next-line max-len
+import { areAnnotationsVisible, getAnnotations, toggleAnnotationsVisibility } from "../../../lib/annotation-api/annotations";
 import { Annotation } from "../../../lib/annotation-api/types";
 import AnnotationEditor from "../../components/AnnotationEditor";
 import { useTranslations } from "next-intl";
@@ -23,9 +24,10 @@ export default function TaskPanePage() {
     const [annotations, setAnnotations] = useState<Annotation[]>([]);
     const [annotationToEdit, setannotationToEdit] = useState<Annotation | null>(null);
     const [exportLoading, setExportLoading] = useState<boolean>(false);
+    const [annotationsVisible, setAnnotationsVisible] = useState<boolean>(areAnnotationsVisible());
+
 
     const select2Id = useId();
-
     const [exportLayers, setExportLayers] = useState<string[]>([]);
     const [selectedExportLayer, setSelectedExportLayer] = useState<string>("default");
 
@@ -45,6 +47,7 @@ export default function TaskPanePage() {
         if (annotationToEdit) {
             highlightAnnotationID(annotationToEdit?.id);
         }
+        setAnnotationsVisible(areAnnotationsVisible());
     }, [annotationToEdit]);
 
     const _getAnnotations = async () => {
@@ -73,7 +76,8 @@ export default function TaskPanePage() {
                     </AccordionPanel>
                 </AccordionItem>
             </Accordion>
-            <div className={"mb-4"}>
+              <div className="space-y-2 mb-4">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <Button
                     icon={!edit ? <EditRegular /> : <EyeFilled />}
                     onClick={() => {
@@ -86,6 +90,18 @@ export default function TaskPanePage() {
                 >
                     {!edit ? "Add Annotation" : "View Annotations"}
                 </Button>
+                  {!edit && (
+        <Button 
+            onClick={async () => {
+                await toggleAnnotationsVisibility();
+                setAnnotationsVisible(areAnnotationsVisible());
+            }}
+            icon = {annotationsVisible ? <EyeFilled/> : <EyeOffRegular/>}
+        >
+            {annotationsVisible ? "Hide Annotations" : "Show Annotations"}
+        </Button>
+    )}
+            </div>
             </div>
             {edit ? (
                 <AnnotationEditor
