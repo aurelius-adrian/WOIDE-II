@@ -1,6 +1,8 @@
 import { v4 } from "uuid";
 import { Annotation, AnnotationProperties } from "./types";
 import { AnnotationType } from "../utils/annotations";
+// eslint-disable-next-line max-len
+import { getDocumentSetting, getDocumentSettingMap, setDocumentSetting, setDocumentSettingMap } from "../settings-api/settings";
 
 export const idSalt = "woideann_";
 
@@ -9,6 +11,10 @@ const originalTagTexts = new Map<string, string>();
 
 export const toggleAnnotationsVisibility = async (): Promise<void> => {
     return await Word.run(async (context) => {
+
+        const newVisibility = !annotationsVisible;
+        await setDocumentSetting("woide_annotationsVisible", newVisibility);
+
         const contentControls = context.document.contentControls;
         contentControls.load();
         await context.sync();
@@ -17,7 +23,13 @@ export const toggleAnnotationsVisibility = async (): Promise<void> => {
             (cc) => cc.tag && cc.tag.includes(idSalt) && (cc.tag.includes("_s") || cc.tag.includes("_e"))
         );
 
-        annotationsVisible = !annotationsVisible;
+        annotationsVisible = newVisibility;
+        const persistedOriginalTexts = await getDocumentSettingMap<string>("woide_originalTexts");
+         if (persistedOriginalTexts.size > 0) {
+            persistedOriginalTexts.forEach((value, key) => {
+                originalTagTexts.set(key, value);
+            });
+        }
 
         for (const cc of annotationControls) {
             if (annotationsVisible) {
@@ -40,13 +52,30 @@ export const toggleAnnotationsVisibility = async (): Promise<void> => {
                 cc.cannotEdit = true;
             }
         }
-
+        await setDocumentSettingMap("woide_originalTexts", originalTagTexts);
         await context.sync();
     });
 };
-
-export const areAnnotationsVisible = (): boolean => {
-    return annotationsVisible;
+export const initializeAnnotationsVisibility = async (): Promise<void> => {
+    const visibility = await getDocumentSetting<boolean>("woide_annotationsVisible");
+    annotationsVisible = visibility !== false;
+    
+    if (!annotationsVisible) {
+        await Word.run(async () => {
+            const originalTexts = await getDocumentSettingMap<string>("woide_originalTexts");
+            originalTexts.forEach((value, key) => {
+                originalTagTexts.set(key, value);
+            });
+        });
+    }
+};
+export const areAnnotationsVisible = async (): Promise<boolean> => {
+    try {
+        const visibility = await getDocumentSetting<boolean>("woide_annotationsVisible");
+        return visibility !== false;
+    } catch (error) {
+        return true; 
+    }
 };
 
 const _randomHexColor = () => {
