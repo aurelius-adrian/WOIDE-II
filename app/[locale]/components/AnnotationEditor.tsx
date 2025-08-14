@@ -16,13 +16,7 @@ import Test from "./Test";
 import { enqueueSnackbar } from "notistack";
 import { Annotation } from "../../lib/annotation-api/types";
 import { removeHighlightAnnotationID } from "../../lib/annotation-api/navigation";
-import {
-    CatalogEntry,
-    GetGlobalCatalog,
-    GetInternalCatalog,
-    GlossaryEntry,
-    ReferenceEntry,
-} from "../../lib/snify-api/catalog";
+import { GetGlobalCatalog, GetInternalCatalog, ReferenceEntry } from "../../lib/snify-api/catalog";
 import { FindMatches, SniffyResult } from "../../lib/snify-api/snify";
 import { AddFilled, EyeFilled } from "@fluentui/react-icons";
 

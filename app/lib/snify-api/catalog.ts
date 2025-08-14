@@ -12,7 +12,6 @@ const _ = require("lodash");
 export type Catalog = { [term: string]: CatalogEntry };
 export type CatalogEntry = { references?: ReferenceEntry[]; ancestors?: Catalog };
 export type ReferenceEntry = { refTypeId: string; data: Record<string, any> };
-export type GlossaryEntry = { refTypeId: string; data: Record<string, any> };
 export type ExternalCatalogData = {
     entries: {
         verb: string;
