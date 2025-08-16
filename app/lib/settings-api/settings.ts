@@ -111,3 +111,11 @@ export async function getAnnotationTypesAsDict(): Promise<Record<string, Annotat
 
     return ret;
 }
+export async function setDocumentSettingMap<T>(key: string, map: Map<string, T>): Promise<void> {
+    await setDocumentSetting(key, Array.from(map.entries()));
+}
+
+export async function getDocumentSettingMap<T>(key: string): Promise<Map<string, T>> {
+    const entries = await getDocumentSetting<[string, T][]>(key);
+    return new Map(entries || []);
+}

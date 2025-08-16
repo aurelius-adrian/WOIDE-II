@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 
 import { DeleteRegular, EyeFilled } from "@fluentui/react-icons";
 import { Button, ToggleButton } from "@fluentui/react-button";
-import { deleteAnnotation, getAnnotations } from "../../lib/annotation-api/annotations";
+// eslint-disable-next-line max-len
+import { areAnnotationsVisible, deleteAnnotation, getAnnotations, toggleAnnotationsVisibility } from "../../lib/annotation-api/annotations";
 import {
     getAnnotationTextByID,
     highlightAnnotationID,
@@ -66,6 +67,9 @@ export const AnnotationView = ({
     };
 
     const editAnnotation = (annotationToEdit: Annotation) => {
+        if(!areAnnotationsVisible()){
+            toggleAnnotationsVisibility();
+        }
         setEditAnnotation(annotationToEdit);
         setEditMode(true);
     };
