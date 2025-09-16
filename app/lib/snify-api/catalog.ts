@@ -181,6 +181,8 @@ export async function GetExternalCatalog(
 export async function GetGlobalCatalog(internal: Catalog): Promise<Catalog> {
     const externalCatalogs = (await getDocumentSetting("externalCatalogs")) as ExternalCatalog[];
 
+    if (!externalCatalogs) return internal;
+
     let res = internal;
 
     for (const e of externalCatalogs) {
