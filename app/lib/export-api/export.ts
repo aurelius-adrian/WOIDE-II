@@ -63,17 +63,22 @@ export async function Export(layer: string): Promise<string> {
             annotationExportData[e.id] = e.exportData;
         });
 
-        const data: { getInnerHTML?: string; getChildrenEval?: string } = {};
+        const data: {
+            getHTMLHead?: string;
+            getInnerHTML?: string;
+            getChildrenEval?: string;
+        } = {};
 
         if (documentExportTemplate.includes("getInnerHTML")) {
-            const res = await Promise.all(await helper(context.document.body.getRange(), layer, context));
             const documentHTML = context.document.body.getRange().getHtml();
             await context.sync();
 
-            data.getInnerHTML = Mustache.render(documentHTMLExportTemplate, {
-                HTMLHead: await getHTMLHead(documentHTML.value),
-                HTMLBody: res.join("\n"),
-            });
+            data.getHTMLHead = await getHTMLHead(documentHTML.value);
+        }
+
+        if (documentExportTemplate.includes("getInnerHTML")) {
+            const res = await Promise.all(await helper(context.document.body.getRange(), layer, context));
+            data.getInnerHTML = res.join("\n");
         }
 
         if (documentExportTemplate.includes("getChildrenEval")) {

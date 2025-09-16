@@ -221,7 +221,9 @@ export default function TemplateRenderer() {
                                     "children with the same layer key returning the export result." +
                                     "\n\n" +
                                     "getChildrenEval: Evaluates all children with the same layer key " +
-                                    "returning the export result."}
+                                    "returning the export result." +
+                                    "\n\n" +
+                                    "getHTMLHead: Gets the whole documents HTML head."}
                             </code>
                         </pre>
                         {data.globalDocumentData && (
