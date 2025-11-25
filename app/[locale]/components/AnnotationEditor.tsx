@@ -19,6 +19,8 @@ import { removeHighlightAnnotationID } from "../../lib/annotation-api/navigation
 import { GetGlobalCatalog, GetInternalCatalog, ReferenceEntry } from "../../lib/snify-api/catalog";
 import { FindMatches, SniffyResult } from "../../lib/snify-api/snify";
 import { AddFilled, EyeFilled } from "@fluentui/react-icons";
+import { getParentAnnotationsInSelection } from "../../lib/annotation-api/annotations";
+import { getAllExportLayers } from "../../lib/settings-api/settings";
 
 interface AnnotationEditorProps {
     setEditMode: (v: boolean) => void;
@@ -32,13 +34,16 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     };
 
     const selectId = useId();
+    const exportLayerid = useId();
     const officeReady = useOfficeReady();
 
     const formRef = useRef<AnnotationFormApi>(null);
     const [selectedAnnotationType, setSelectedAnnotationType] = useState<AnnotationType | null>(null);
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
     const [annotationIndex, setAnnotationIndex] = useState<string>("defaultSelector");
-
+    const [exportLayers, setExportLayers] = useState<string[]>([]);
+    
+    const [selectedExportLayer, setSelectedExportLayer] = useState<string>("defaultSelector");
     //Snify Data
     const [sniffyView, setSniffyView] = useState<boolean>(false);
     const [sniffyResult, setSniffyResult] = useState<SniffyResult[] | undefined>();
@@ -48,6 +53,8 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
     useEffect(() => {
         const _getData = async () => {
             setAnnotationTypes(((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[]);
+            setExportLayers(await getAllExportLayers());
+
         };
 
         if (officeReady) _getData();
@@ -71,7 +78,7 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedAnnotationType]);
-
+ 
     const addAnnotation = async () => {
         try {
             const data = await formRef.current?.submit();
@@ -84,7 +91,27 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                 });
                 return;
             }
-
+        const currentLayer = selectedExportLayer;
+         const allowedParents = selectedAnnotationType?.allowedParents?.[currentLayer];
+        if (allowedParents && allowedParents !== "any") {
+        const parentAnnotations = await getParentAnnotationsInSelection();
+        const parentFound = parentAnnotations.some(
+                (a) => allowedParents.includes(a.annotationTypeId)
+            );
+        const allowedParentNames = allowedParents
+            .map(id => annotationTypes.find(a => a.id === id))
+            .filter(Boolean)
+            .map(a => a!.name);
+ 
+            if (!parentFound) {
+                enqueueSnackbar({
+                    message: `This annotation must be inside one of: ${allowedParentNames.join(", ")} (layer: ${currentLayer})`,
+                    variant: "error",
+                    autoHideDuration: 3000,
+                });
+                return;
+            }
+        }
             await insertAnnotation({
                 data: { ...data },
                 annotationTypeId: selectedAnnotationType?.id,
@@ -200,6 +227,25 @@ export const AnnotationEditor = ({ setEditMode, updateAnnotations, editAnnotatio
                         </option>
                     ))}
                 </Select>
+            <label htmlFor={exportLayerid}>Export Layer</label>
+      <Select
+    value={selectedExportLayer}
+    id={exportLayerid}
+    className={"mb-6"}
+    onChange={(e) => {
+        formRef.current?.reset();
+        setSelectedExportLayer(e.target.value);
+    }}
+>
+    <option disabled value="defaultSelector">
+        Select an Export Layer
+    </option>
+    {exportLayers.map((layer) => (
+        <option key={layer} value={layer}>
+            {layer}
+        </option>
+    ))}
+</Select>
                 <div className={"mb-4"}>
                     <Form
                         formDescription={selectedAnnotationType?.formDescription ?? []}
