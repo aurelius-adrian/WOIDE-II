@@ -9,11 +9,15 @@ import { enqueueSnackbar } from "notistack";
 import { Select as SelectComponent } from "@fluentui/react-select";
 import { useOfficeReady } from "./Setup";
 import { getEmptyJSON } from "../../lib/annotation-api/annotations";
+import { getAllExportLayers } from "../../lib/settings-api/settings";
+
 
 export const EditAnnotationType = ({ annotationType }: { annotationType: AnnotationType }) => {
     const formApi = useRef<AnnotationFormApi>(null);
     const [tmpId, setTmpId] = useState<string | null>(null);
     const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>(annotationType.exportData);
+    const [allowedParents, setAllowedParents] = useState<AnnotationType["allowedParents"]>(annotationType.allowedParents ?? {});
+    const [exportLayers, setExportLayers] = useState<string[]>([]);
     const [annotationTypes, setAnnotationTypes] = useState<AnnotationType[]>([]);
     const [globalDocumentData, setGlobalDocumentData] = useState<{ [key: string]: string }>({});
     const [selectedReferenceAnnotationTypeId, setSelectedReferenceAnnotationTypeId] = useState<string>(
@@ -21,6 +25,9 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
     );
     const [enableSniffy, setEnableSniffy] = useState<boolean>(annotationType.enableSniffy ?? false);
     const [dataTemplateData, setDataTemplateData] = useState<undefined | string>(annotationType.referenceDataTemplate);
+    const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
+    const [currentSelections, setCurrentSelections] = useState<string[]>([]);
+    const [isSelectAll, setIsSelectAll] = useState(false);
     const officeReady = useOfficeReady();
 
     const dialog = useRef<Office.Dialog>();
@@ -38,6 +45,21 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
         setTmpId(annotationType.id ?? v4());
     }, [annotationType]);
 
+    useEffect(() => {
+        const _getData = async () => {
+            setExportLayers(await getAllExportLayers());
+            setAnnotationTypes((await getDocumentSetting<AnnotationType[]>("annotationTypes")) ?? []);
+        };
+        _getData();
+    }, []);
+
+    const handleAllowedParentsChange = (layer: string, value: string[]) => {
+        setAllowedParents((prev) => ({
+            ...prev,
+            [layer]: value.includes("any") ? "any" : value,
+        }));
+    };
+
     const saveAnnotationType = async (_exportData?: unknown, _dataTemplateData?: unknown) => {
         try {
             const data = await formApi.current?.submit();
@@ -52,6 +74,9 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 });
                 return;
             }
+            if (selectedLayer) {
+                saveLayerSelections(selectedLayer, currentSelections, isSelectAll);
+                }
 
             const prevAnnotationTypes = ((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[];
             const idx = prevAnnotationTypes.findIndex((e) => e.id === tmpId);
@@ -66,6 +91,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                         referenceAnnotationTypeId:
                             selectedReferenceAnnotationTypeId === "" ? undefined : selectedReferenceAnnotationTypeId,
                         referenceDataTemplate: _dataTemplateData || dataTemplateData,
+                        allowedParents,
                     } as AnnotationType),
                 );
             } else {
@@ -79,6 +105,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                         referenceAnnotationTypeId:
                             selectedReferenceAnnotationTypeId === "" ? undefined : selectedReferenceAnnotationTypeId,
                         referenceDataTemplate: _dataTemplateData || dataTemplateData,
+                        allowedParents
                     },
                 ]);
             }
@@ -215,6 +242,46 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
             },
         );
     };
+// Save current layer’s state into allowedParents when switching layers
+const saveLayerSelections = (layer: string, selections: string[], selectAll: boolean) => {
+  setAllowedParents((prev) => ({
+    ...prev,
+    [layer]: selectAll ? "any" : selections,
+  }));
+};
+
+const handleLayerChange = (newLayer: string) => {
+  if (selectedLayer) {
+    saveLayerSelections(selectedLayer, currentSelections, isSelectAll);
+  }
+
+  setSelectedLayer(newLayer);
+
+  const layerData = allowedParents?.[newLayer];
+  if (layerData === "any") {
+    setIsSelectAll(true);
+    setCurrentSelections([]);
+  } else {
+    setIsSelectAll(false);
+    setCurrentSelections((layerData as string[]) ?? []);
+  }
+};
+
+const toggleSelectAll = () => {
+  const newValue = !isSelectAll;
+  setIsSelectAll(newValue);
+  if (newValue) {
+    setCurrentSelections([]);
+  }
+};
+
+const handleCheckboxChange = (annotationId: string) => {
+  setCurrentSelections((prev) =>
+    prev.includes(annotationId)
+      ? prev.filter((id) => id !== annotationId)
+      : [...prev, annotationId],
+  );
+};
 
     return (
         <div className={"flex flex-col gap-2 items-start"}>
@@ -241,7 +308,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                             required: true,
                         },
                     ]}
-                    formData={annotationType as Omit<AnnotationType, "enableSniffy">}
+                    formData={annotationType as Omit<AnnotationType, "enableSniffy" | "allowedParents">}
                 />
             </div>
             <div>
@@ -281,6 +348,89 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
                 </div>
             </div>
             <Divider />
+               {/* <div className="mt-4">
+                <h4>Allowed Parents (per export layer)</h4>
+                {exportLayers.map((layer) => (
+                    <div key={layer} className="mb-2">
+                        <Label>{layer}</Label>
+                        <SelectComponent
+                            multiple
+                            value={
+                                allowedParents?.[layer] === "any"
+                                    ? ["any"]
+                                    : (allowedParents?.[layer] as string[]) ?? []
+                            }
+                            onChange={(e) => {
+                                const options = Array.from(e.target.selectedOptions).map((o) => o.value);
+                                handleAllowedParentsChange(layer, options);
+                            }}
+                        >
+                            <option value="any">Any</option>
+                            {annotationTypes
+                                .filter((t) => t.id !== annotationType.id)
+                                .map((t) => (
+                                    <option key={t.id} value={t.id}>
+                                        {t.name}
+                                    </option>
+                                ))}
+                        </SelectComponent>
+                    </div>
+                ))}
+            </div> */}
+            <div className="mt-4 w-full">
+  <h4 className="text-lg font-semibold mb-2">Allowed Parents (per export layer)</h4>
+
+  <div className="flex flex-row gap-2 items-center mb-4">
+    <Label>Select Export Layer:</Label>
+    <SelectComponent
+      value={selectedLayer || ""}
+      onChange={(e) => handleLayerChange(e.target.value)}
+    >
+      <option value="" disabled>
+        Select a layer
+      </option>
+      {exportLayers.map((layer) => (
+        <option key={layer} value={layer}>
+          {layer}
+        </option>
+      ))}
+    </SelectComponent>
+  </div>
+
+  {selectedLayer && (
+    <div className="flex flex-col gap-2 border rounded-lg p-3 bg-gray-50">
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={isSelectAll}
+          onChange={toggleSelectAll}
+          label="Select All (Any)"
+        />
+      </div>
+
+      {!isSelectAll && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-2 max-h-60 overflow-y-auto">
+          {annotationTypes
+            .filter((t) => t.id !== annotationType.id)
+            .map((t) => (
+              <label
+                key={t.id}
+                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 rounded px-2 py-1"
+              >
+                <input
+                  type="checkbox"
+                  checked={currentSelections.includes(t.id!)}
+                  onChange={() => handleCheckboxChange(t.id!)}
+                />
+                <span>{t.name}</span>
+              </label>
+            ))}
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+            
             <div className={"flex flex-row space-x-2"}>
                 <Button onClick={() => saveAnnotationType()}>Save Annotation Type</Button>
                 <Button onClick={deleteAnnotationType}>Delete Annotation Type</Button>

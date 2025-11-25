@@ -10,4 +10,8 @@ export type AnnotationType = {
     enableSniffy?: boolean;
     referenceAnnotationTypeId?: string;
     referenceDataTemplate?: string;
+    allowedParents?: {
+    [layer: string]: string[] | "any" | undefined;
+  };
+    
 };

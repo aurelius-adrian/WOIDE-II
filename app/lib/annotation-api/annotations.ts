@@ -108,6 +108,55 @@ export const getAnnotationsInSelection: () => Promise<Annotation[]> = async () =
         });
     });
 };
+export const getParentAnnotationsInSelection = async (): Promise<Annotation[]> => {
+    return await Word.run(async (context) => {
+        const selection = context.document.getSelection();
+        const selectionStart = selection.getRange(Word.RangeLocation.start);
+        const selectionEnd = selection.getRange(Word.RangeLocation.end);
+
+        const contentControls = context.document.contentControls;
+        contentControls.load("tag, title, color");
+        await context.sync();
+
+        const annotationStarts = contentControls.items.filter((cc) => cc.tag?.startsWith(idSalt + "_s"));
+        const parents: Annotation[] = [];
+
+        for (const startCC of annotationStarts) {
+            const endTag = startCC.tag.replace("_s", "_e");
+            const endCC = contentControls.items.find((cc) => cc.tag === endTag);
+            if (!endCC) continue;
+
+            const annotationRange = _getAnnotationRange(startCC.getRange(), endCC.getRange());
+            const annotationStart = annotationRange.getRange(Word.RangeLocation.start);
+            const annotationEnd = annotationRange.getRange(Word.RangeLocation.end);
+
+            selectionStart.load("text");
+            selectionEnd.load("text");
+            annotationStart.load("text");
+            annotationEnd.load("text");
+            await context.sync();
+
+            const startComparison = selectionStart.compareLocationWith(annotationStart);
+            const endComparison = selectionEnd.compareLocationWith(annotationEnd);
+            await context.sync();
+
+            const startOk = startComparison.value === "After" || startComparison.value === "Equal";
+            const endOk = endComparison.value === "Before" || endComparison.value === "Equal";
+
+            if (startOk && endOk) {
+                const data = JSON.parse(startCC.title);
+                parents.push({
+                    id: startCC.tag.slice(idSalt.length + 2),
+                    annotationTypeId: data.annotationTypeId,
+                    data: data.data,
+                    color: startCC.color,
+                });
+            }
+        }
+
+        return parents;
+    });
+};
 
 export const getAnnotations: () => Promise<Annotation[]> = async () => {
     return await Word.run(async (context) => {

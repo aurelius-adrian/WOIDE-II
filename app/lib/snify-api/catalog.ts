@@ -12,7 +12,6 @@ const _ = require("lodash");
 export type Catalog = { [term: string]: CatalogEntry };
 export type CatalogEntry = { references?: ReferenceEntry[]; ancestors?: Catalog };
 export type ReferenceEntry = { refTypeId: string; data: Record<string, any> };
-export type GlossaryEntry = { refTypeId: string; data: Record<string, any> };
 export type ExternalCatalogData = {
     entries: {
         verb: string;
@@ -181,6 +180,8 @@ export async function GetExternalCatalog(
 
 export async function GetGlobalCatalog(internal: Catalog): Promise<Catalog> {
     const externalCatalogs = (await getDocumentSetting("externalCatalogs")) as ExternalCatalog[];
+
+    if (!externalCatalogs) return internal;
 
     let res = internal;
 
