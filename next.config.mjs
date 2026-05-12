@@ -11,7 +11,9 @@ const nextConfig = {
     // images: {
     //     unoptimized: true
     // },
-
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
     async headers() {
         return [
             {

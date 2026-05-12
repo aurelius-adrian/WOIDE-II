@@ -1,0 +1,431 @@
+{
+  "annotationTypes": [
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Definition For",
+          "required": false,
+          "id": "definitionFor"
+        },
+        {
+          "type": "textInput",
+          "label": "Defination Name",
+          "required": true,
+          "id": "name"
+        },
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "moduleName"
+        }
+      ],
+      "name": "sDefinition",
+      "exportData": {
+        "default": "<span style=\"counter-set:ftml-para 1;\" class=\"ftml-definition\">\n    <span class=\"rustex-contents\" data-ftml-definition=\"\" data-ftml-inline=\"false\" data-ftml-id=\"{{name}}.def\" \n         {{#definitionFor}}data-ftml-fors=\"{{{base_uri}}}&p=mod&m={{moduleName}}&s={{definitionFor}}\"{{/definitionFor}}\n    \n    >\n\t    <span class=\"rustex-paragraph rustex-withwidth woide-inline\">\n         <span class=\"ftml-title-paragraph\">\n            <!---->\n         </span>\n         <!---->\n            {{{getInnerHTML}}}\n        </span>\n    </span>\n</span>"
+      },
+      "color": "#0061ff",
+      "id": "ecafa57e-cbab-42ca-b585-d976c9e1f099",
+      "enableSniffy": true,
+      "description": "",
+      "referenceAnnotationTypeId": "afcda8a1-6392-466b-bd54-9465627a9129",
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "module_name"
+        },
+        {
+          "type": "textInput",
+          "label": "Name",
+          "required": true,
+          "id": "name"
+        }
+      ],
+      "name": "Definame",
+      "exportData": {
+        "default": "<span class=\"ftml-def-comp\">\n    <span data-ftml-definiendum=\"{{{base_uri}}}&m={{module_name}}&s={{name}}\" class=\"woide-symbol\">\n        {{{getInnerHTML}}}\n    </span>\n</span>"
+      },
+      "color": "#ff40ff",
+      "id": "a99c9db6-3872-438e-8886-48cf042faa37",
+      "enableSniffy": true,
+      "referenceAnnotationTypeId": "038bd74a-b630-4339-88f7-523315178f50",
+      "referenceDataTemplate": "{\"symbol_name\":\"{{name}}\", \"module_name\": \"{{module_name}}\"}",
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "module_name"
+        },
+        {
+          "type": "textInput",
+          "label": "Symbol Name",
+          "required": true,
+          "id": "symbol_name"
+        }
+      ],
+      "name": "Internal Symbol Reference",
+      "exportData": {
+        "default": "<span data-ftml-term=\"OMID\" data-ftml-head=\"{{{base_uri}}}&p=mod&m={{module_name}}&s={{symbol_name}}\" data-ftml-notationid=\"\" class=\"woide-ref\">\n    <span class=\"ftml-comp\" data-ftml-comp=\"\">\n        {{{getInnerHTML}}}\n    </span>\n</span>"
+      },
+      "color": "#85c0ff",
+      "id": "7464fd1c-8efa-4252-9a6e-c4ba141c8069",
+      "enableSniffy": true,
+      "referenceAnnotationTypeId": "038bd74a-b630-4339-88f7-523315178f50",
+      "referenceDataTemplate": "{\n    \"module_name\": \"{{module_name}}\",\n    \"symbol_name\": \"{{symbol_name}}\"\n}",
+      "description": "",
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Symbol URI",
+          "required": true,
+          "id": "symbol_uri"
+        }
+      ],
+      "name": "External Symbol Reference",
+      "exportData": {
+        "default": "<span data-ftml-term=\"OMID\" data-ftml-head=\"{{{symbol_uri}}}\" data-ftml-notationid=\"\" class=\"woide-ref\">\n    <span class=\"ftml-comp\" data-ftml-comp=\"\">\n        {{{getInnerHTML}}}\n    </span>\n</span>"
+      },
+      "color": "#61dfff",
+      "id": "9eeec912-af9a-4bb9-8716-42dea8c2044d",
+      "enableSniffy": true,
+      "referenceAnnotationTypeId": "a2d76d42-cc07-4f1d-895b-647766a76ff2",
+      "referenceDataTemplate": "{\"symbol_uri\":\"{{{symbol_uri}}}\"}",
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "moduleName"
+        }
+      ],
+      "name": "sModule",
+      "exportData": {
+        "default": "<span class=\"ftml-def-comp\">\r\n    <span data-ftml-module=\"{{moduleName}}\" class=\"woide-module\">\r\n        {{{getInnerHTML}}}\r\n    </span>\r\n</span>"
+      },
+      "color": "#df8fe0",
+      "id": "b046f5c7-ad1b-4c73-a520-779ef2b00c9b",
+      "enableSniffy": false,
+      "allowedParents": {
+        "default": "any"
+      },
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Symbol Name",
+          "required": true,
+          "id": "symbolName"
+        }
+      ],
+      "name": "Symbol Declaration",
+      "exportData": {
+        "default": "<span data-ftml-symdecl=\"{{symbolName}}\" class=\"woide-symbol-declaration\" style=\"display:none\">\r\n    {{{getInnerHTML}}}\r\n  </span>"
+      },
+      "color": "#9626b5",
+      "id": "d0d7899f-4375-47d5-b9f4-e0320bb6c303",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Name",
+          "required": true,
+          "id": "Name"
+        },
+        {
+          "type": "textInput",
+          "label": "Style",
+          "required": true,
+          "id": "Style"
+        },
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "module"
+        }
+      ],
+      "name": "sAssertion",
+      "exportData": {
+        "default": "<span class=\"rustex-contents\"\r\n     data-ftml-assertion=\"\"\r\n     data-ftml-inline=\"false\"\r\n     data-ftml-fors=\"{{{base_uri}}}&p=mod&m={{module}}&s={{Name}}\"\r\n     data-ftml-styles=\"{{Style}}\">\r\n  <span class=\"rustex-paragraph rustex-withwidth\">\r\n    <span class=\"rustex-contents\" data-ftml-title=\"\" style=\"display:none;\"></span>\r\n    {{{getInnerHTML}}}\r\n  </span>\r\n</span>"
+      },
+      "color": "#dbd514",
+      "id": "47996b31-593c-4513-bc5e-dca4b272fd7f",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Symbol Name",
+          "required": true,
+          "id": "symbolName"
+        },
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "module"
+        }
+      ],
+      "name": "Sn",
+      "exportData": {
+        "default": "<span class=\"rustex-contents\"\r\n     data-ftml-term=\"OMID\"\r\n     data-ftml-head=\"{{{base_uri}}}&p=mod&m={{module}}&s={{symbolName}}\"\r\n     data-ftml-notationid=\"\">\r\n  <span class=\"rustex-contents\" data-ftml-comp=\"\">\r\n    {{{getInnerHTML}}}\r\n  </span>\r\n</span>"
+      },
+      "color": "#f22626",
+      "id": "d749b4fc-9ef5-4aaf-9847-9d1b9674a53f",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Style",
+          "required": false,
+          "id": "style"
+        },
+        {
+          "type": "textInput",
+          "label": "Paragraph For URI",
+          "required": false,
+          "id": "paragraphfors"
+        }
+      ],
+      "name": "sParagraph",
+      "exportData": {
+        "default": "<span class=\"rustex-contents\"\r\n     data-ftml-paragraph=\"\"\r\n     data-ftml-inline=\"false\"\r\n     {{#style}}data-ftml-styles=\"{{style}}\"{{/style}}\r\n     {{#paragraphfors}}data-ftml-fors=\"{{paragraphfors}}\"{{/paragraphfors}}\r\n     >\r\n  <span class=\"rustex-paragraph rustex-withwidth\">\r\n    <span class=\"rustex-contents\" data-ftml-title=\"\" style=\"display:none;\"></span>\r\n    {{{getInnerHTML}}}\r\n  </span>\r\n</span>"
+      },
+      "color": "#600b0b",
+      "id": "89a91b64-d478-480c-b935-a7507840fb64",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Module Name",
+          "required": true,
+          "id": "moduleName"
+        },
+        {
+          "type": "textInput",
+          "label": "Symbol Name",
+          "required": true,
+          "id": "symbolName"
+        }
+      ],
+      "name": "Sr",
+      "exportData": {
+        "default": "<span class=\"rustex-contents\"\r\n     data-ftml-term=\"OMID\"\r\n     data-ftml-head=\"{{{base_uri}}}&p=mod&m={{moduleName}}&s={{symbolName}}\"\r\n     data-ftml-notationid=\"\">\r\n  <span class=\"rustex-contents\" data-ftml-comp=\"\">\r\n    {{{getInnerHTML}}}\r\n  </span>\r\n</span>"
+      },
+      "color": "#4b469b",
+      "id": "b43abae1-c18b-44cd-a436-1cbea0ceb3a6",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Variable Name",
+          "required": true,
+          "id": "variableName"
+        },
+        {
+          "type": "textInput",
+          "label": "Variable Type URI",
+          "required": true,
+          "id": "variableType"
+        }
+      ],
+      "name": "Variable Definition",
+      "exportData": {
+        "default": "<span data-ftml-vardef=\"{{variableName}}\" class=\"woide-variable-definition\">\r\n  <span data-ftml-type=\"\">\r\n    <span data-ftml-term=\"OMID\" data-ftml-head=\"{{variableType}}\"></span>\r\n    </span>\r\n    {{{getInnerHTML}}}\r\n  </span>"
+      },
+      "color": "#7c1d1d",
+      "id": "a5adaee3-6231-44b6-8cb6-b372f25d14e2",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Variable Name",
+          "required": true,
+          "id": "variableName"
+        }
+      ],
+      "name": "Variable Reference",
+      "exportData": {
+        "default": "<span class=\"rustex-contents\"\r\n     data-ftml-term=\"OMV\"\r\n     data-ftml-head=\"{{{base_uri}}}&d=mod&l=en&e=paragraph/{{variableName}}\"\r\n     data-ftml-notationid=\"\">\r\n  <span class=\"rustex-contents\" data-ftml-comp=\"\">\r\n    {{{getInnerHTML}}}\r\n  </span>\r\n</span>"
+      },
+      "color": "#d8f312",
+      "id": "42fabbfd-a829-4ba5-a6de-3c6873a91544",
+      "enableSniffy": false,
+      "allowedParents": {},
+      "description": ""
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Module URI",
+          "required": true,
+          "id": "moduleURI"
+        }
+      ],
+      "name": "Import Module",
+      "exportData": {
+        "default": "<span class=\"ftml-def-comp\">\r\n    <span data-ftml-import={{moduleURI}} class=\"woide-module-import\">\r\n        {{{getInnerHTML}}}\r\n    </span>\r\n</span>"
+      },
+      "color": "#c52020",
+      "id": "dd8b71b0-f002-4abf-a1e7-05e11c877bf5",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Module URI",
+          "required": true,
+          "id": "moduleURI"
+        }
+      ],
+      "name": "Use Module",
+      "exportData": {
+        "default": "<span class=\"ftml-def-comp\">\r\n    <span data-ftml-usemodule={{moduleURI}} class=\"woide-module-import\">\r\n        {{{getInnerHTML}}}\r\n    </span>\r\n</span>"
+      },
+      "color": "#1f1ca0",
+      "id": "c7833072-ef23-44e7-bd20-48afe995f3f7",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [],
+      "name": "Fragment",
+      "exportData": {
+        "default": "<section class=\"rustex-contents\" data-ftml-section=\"0\">\r\n    {{{getInnerHTML}}}\r\n</section>"
+      },
+      "color": "#e82121",
+      "id": "68434877-6f04-4dae-8e03-4ddb7b40e2dd",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [],
+      "name": "Title",
+      "exportData": {
+        "default": "<h1 class=\"rustex-contents\" data-ftml-title=\"\">\r\n    {{{getInnerHTML}}}\r\n</h1>"
+      },
+      "color": "#6f2f2f",
+      "id": "818760a8-a30f-4e7b-add5-5a54e3020294",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [],
+      "name": "Enumration",
+      "exportData": {
+        "default": "<div class=\"rustex-contents woide-enumerate\" data-ftml-enumerate=\"\">\r\n  {{{getInnerHTML}}}\r\n</div>"
+      },
+      "color": "#32c84b",
+      "id": "a824289d-baee-4938-89e1-45796867e006",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [],
+      "name": "Itemize",
+      "exportData": {
+        "default": "<div class=\"rustex-contents woide-itemize\" data-ftml-itemize=\"\">\r\n  {{{getInnerHTML}}}\r\n</div>"
+      },
+      "color": "#12b5a2",
+      "id": "2a37facf-86c1-4230-ba02-fd1d23a82932",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Label",
+          "required": true,
+          "id": "label"
+        }
+      ],
+      "name": "Item",
+      "exportData": {
+        "default": "<a id=\"Item.{{label}}\"></a>\r\n<span\r\n  class=\"rustex-paragraph woide-item\"\r\n  data-ftml-item=\"\"\r\n  data-ftml-item-label=\"{{label}}\"\r\n>\r\n  <span class=\"woide-item-label\">{{label}}</span><span class=\"woide-item-body\">{{{getInnerHTML}}}</span>\r\n</span>\r\n"
+      },
+      "color": "#b6aa25",
+      "id": "ebc405e2-bb51-4bce-a29a-60d2d7741332",
+      "enableSniffy": false,
+      "allowedParents": {
+        "default": [
+          "a824289d-baee-4938-89e1-45796867e006",
+          "2a37facf-86c1-4230-ba02-fd1d23a82932"
+        ]
+      }
+    },
+    {
+      "formDescription": [
+        {
+          "type": "textInput",
+          "label": "Foot Note Label",
+          "required": true,
+          "id": "label"
+        }
+      ],
+      "name": "Footnote",
+      "exportData": {
+        "default": "<span class=\"woide-footnote\" data-ftml-footnote=\"\">\r\n  <a class=\"rustex-link woide-footnote-ref\"\r\n     href=\"#Hfootnote.{{label}}\"\r\n     style=\"text-decoration:none; vertical-align:super; font-size:0.8em;\">\r\n    {{label}}\r\n  </a>\r\n  <span id=\"Hfootnote.{{label}}\"\r\n        class=\"woide-footnote-body\"\r\n        style=\"display:block; font-size:80%; margin-top:4px;\">\r\n    <sup>{{label}}</sup>{{{getInnerHTML}}}\r\n  </span>\r\n</span>"
+      },
+      "color": "#cc1414",
+      "id": "43e1b2e7-53a7-47d7-8ad9-599a10ad2196",
+      "enableSniffy": false,
+      "allowedParents": {}
+    },
+    {
+      "formDescription": [],
+      "name": "NormRef",
+      "exportData": {
+        "default": "<style>\r\n  .normref-wrapper { white-space:nowrap;  text-decoration:underline}\r\n</style>\r\n\r\n<span class=\"normref-wrapper\">\r\n{{{getInnerHTML}}}\r\n</span>"
+      },
+      "color": "#b22e2e",
+      "id": "123316c3-d23f-487d-bf6b-81b05ddad77c",
+      "enableSniffy": false,
+      "allowedParents": {}
+    }
+  ]
+}

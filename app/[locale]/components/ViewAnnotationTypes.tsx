@@ -13,8 +13,10 @@ import {
     DialogContent,
     DialogSurface,
     DialogTitle,
+    Label,
     Radio,
     RadioGroup,
+    Select as SelectComponent,
 } from "@fluentui/react-components";
 import { validateAnnotationTypes } from "./utils/AnnotationTypeValidation";
 import { enqueueSnackbar } from "notistack";
@@ -24,6 +26,21 @@ import ImportCatalogDialog from "./ImportCatalogDialog";
 type ImportResolution = {
     [name: string]: "replace" | "skip";
 };
+
+type WoideDomainPreset = {
+    id: string;
+    label: string;
+    path: string;
+};
+
+const WOIDE_DOMAIN_PRESETS: WoideDomainPreset[] = [
+    {
+        id: "legal",
+        label: "Legal",
+        path: "/woide-presets/legal-woide.json",
+    },
+];
+
 export const ViewAnnotationTypes = ({
     setAnnotationType,
 }: {
@@ -40,6 +57,8 @@ export const ViewAnnotationTypes = ({
     const handleUploadClick = () => {
         fileInputRef.current?.click();
     };
+    const [selectedPresetId, setSelectedPresetId] = useState("");
+    const [isLoadingPreset, setIsLoadingPreset] = useState(false);
 
     const dialog = useRef<Office.Dialog>();
     const [exportData, setExportData] = useState<{ [key: string]: string } | undefined>();
@@ -105,6 +124,134 @@ export const ViewAnnotationTypes = ({
         });
     }
 
+    const sanitizeImportedAnnotationTypes = (types: AnnotationType[]) =>
+        types.map((type) => ({
+            ...type,
+            name: type.name?.trim() || `Unnamed Type ${v4().slice(0, 4)}`,
+            description: type.description?.trim() || "",
+            formDescription: type.formDescription.map((el) => ({
+                ...el,
+                options: el.type === "select" ? (el as any).options || [] : undefined,
+            })),
+        }));
+
+    const resolveImportedAnnotationTypes = (types: AnnotationType[], resolutions: ImportResolution = {}) => {
+        const existingByName = new Map(annotationTypes.map((t) => [t.name.toLowerCase(), t]));
+        const importedBySourceId = new Map(
+            types.filter((type) => type.id).map((type) => [type.id as string, type] as const),
+        );
+        const targetIdByName = new Map<string, string>();
+
+        types.forEach((type) => {
+            const normalizedName = type.name.toLowerCase();
+            const existing = existingByName.get(normalizedName);
+            const resolution = resolutions[type.name];
+
+            if (existing && (resolution === "replace" || resolution === "skip")) {
+                targetIdByName.set(normalizedName, existing.id as string);
+                return;
+            }
+
+            targetIdByName.set(normalizedName, v4());
+        });
+
+        const remapLinkedAnnotationId = (id?: string) => {
+            if (!id) {
+                return undefined;
+            }
+
+            const importedType = importedBySourceId.get(id);
+            if (!importedType) {
+                return id;
+            }
+
+            return targetIdByName.get(importedType.name.toLowerCase()) ?? id;
+        };
+
+        const remapAllowedParents = (allowedParents: AnnotationType["allowedParents"]) => {
+            if (!allowedParents) {
+                return allowedParents;
+            }
+
+            const remappedAllowedParents: NonNullable<AnnotationType["allowedParents"]> = {};
+
+            Object.entries(allowedParents).forEach(([layer, value]) => {
+                if (value === undefined) {
+                    remappedAllowedParents[layer] = undefined;
+                    return;
+                }
+
+                if (value === "any") {
+                    remappedAllowedParents[layer] = "any";
+                    return;
+                }
+
+                remappedAllowedParents[layer] = value
+                    .map((parentId) => remapLinkedAnnotationId(parentId))
+                    .filter((parentId): parentId is string => !!parentId);
+            });
+
+            return remappedAllowedParents;
+        };
+
+        return types
+            .filter((type) => {
+                const existing = existingByName.get(type.name.toLowerCase());
+                return !(existing && resolutions[type.name] === "skip");
+            })
+            .map((type) => ({
+                ...type,
+                id: targetIdByName.get(type.name.toLowerCase()) ?? v4(),
+                referenceAnnotationTypeId: remapLinkedAnnotationId(type.referenceAnnotationTypeId),
+                allowedParents: remapAllowedParents(type.allowedParents),
+            }));
+    };
+
+    const importAnnotationTypesFromPayload = async (parsedData: unknown, successMessage: string) => {
+        const rawAnnotationTypes = Array.isArray(parsedData)
+            ? parsedData
+            : ((parsedData as { annotationTypes?: unknown[] })?.annotationTypes ?? []);
+
+        if (rawAnnotationTypes.length === 0) {
+            throw new Error("No annotation types found in the file.");
+        }
+
+        const { isValid, error, validatedData } = validateAnnotationTypes(rawAnnotationTypes);
+        if (!isValid || !validatedData) {
+            throw new Error(error || "Invalid annotation types format.");
+        }
+
+        const processedAnnotationTypes = sanitizeImportedAnnotationTypes(validatedData);
+
+        const existingMap = new Map(annotationTypes.map((t) => [t.name.toLowerCase(), t]));
+        const duplicates = processedAnnotationTypes.filter((t) => existingMap.has(t.name.toLowerCase()));
+
+        if (duplicates.length > 0) {
+            const defaultResolutions = Object.fromEntries(duplicates.map((t) => [t.name, "replace" as const]));
+
+            setImportResolution(defaultResolutions);
+            setDuplicates(
+                duplicates.map((d) => ({
+                    original: existingMap.get(d.name.toLowerCase())!,
+                    imported: d,
+                })),
+            );
+            setPendingImport(processedAnnotationTypes);
+            setShowResolutionDialog(true);
+            return;
+        }
+
+        const resolvedImportedTypes = resolveImportedAnnotationTypes(processedAnnotationTypes);
+        const merged = [...annotationTypes, ...resolvedImportedTypes];
+        await setDocumentSetting("annotationTypes", merged);
+        setAnnotationTypes(merged);
+        enqueueSnackbar({
+            message: successMessage,
+            variant: "success",
+            autoHideDuration: 2500,
+        });
+    };
+
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = event.target.files?.[0];
         if (!selectedFile) return;
@@ -112,59 +259,10 @@ export const ViewAnnotationTypes = ({
         try {
             const fileContent = await selectedFile.text();
             const parsedData = JSON.parse(fileContent);
-
-            const rawAnnotationTypes = Array.isArray(parsedData) ? parsedData : parsedData.annotationTypes || [];
-
-            if (rawAnnotationTypes.length === 0) {
-                throw new Error("No annotation types found in the file.");
-            }
-
-            // Validate
-            const { isValid, error, validatedData } = validateAnnotationTypes(rawAnnotationTypes);
-            if (!isValid || !validatedData) {
-                throw new Error(error || "Invalid annotation types format.");
-            }
-
-            // Clean + re-ID
-            const processedAnnotationTypes = validatedData.map((type) => ({
-                ...type,
-                id: v4(),
-                name: type.name?.trim() || `Unnamed Type ${v4().slice(0, 4)}`,
-                description: type.description?.trim() || "",
-                formDescription: type.formDescription.map((el) => ({
-                    ...el,
-                    options: el.type === "select" ? (el as any).options || [] : undefined,
-                })),
-            }));
-
-            // Check for duplicates
-            const existingMap = new Map(annotationTypes.map((t) => [t.name.toLowerCase(), t]));
-            const duplicates = processedAnnotationTypes.filter((t) => existingMap.has(t.name.toLowerCase()));
-
-            if (duplicates.length > 0) {
-                const defaultResolutions = Object.fromEntries(duplicates.map((t) => [t.name, "replace" as const]));
-
-                setImportResolution(defaultResolutions);
-                setDuplicates(
-                    duplicates.map((d) => ({
-                        original: existingMap.get(d.name.toLowerCase())!,
-                        imported: d,
-                    })),
-                );
-                setPendingImport(processedAnnotationTypes);
-                setShowResolutionDialog(true);
-                return;
-            }
-
-            // No duplicates: merge and save
-            const merged = [...annotationTypes, ...processedAnnotationTypes];
-            await setDocumentSetting("annotationTypes", merged);
-            setAnnotationTypes(merged);
-            enqueueSnackbar({
-                message: `${processedAnnotationTypes.length} annotation types imported successfully!`,
-                variant: "success",
-                autoHideDuration: 2500,
-            });
+            await importAnnotationTypesFromPayload(
+                parsedData,
+                `${Array.isArray(parsedData) ? parsedData.length : parsedData.annotationTypes?.length || 0} annotation types imported successfully!`,
+            );
         } catch (err) {
             enqueueSnackbar({
                 message: err instanceof Error ? err.message : "Failed to import annotations.",
@@ -178,33 +276,53 @@ export const ViewAnnotationTypes = ({
         }
     };
 
+    const handleLoadPreset = async () => {
+        if (!selectedPresetId) {
+            enqueueSnackbar({
+                message: "Select a domain preset first.",
+                variant: "warning",
+                autoHideDuration: 2500,
+            });
+            return;
+        }
+
+        const preset = WOIDE_DOMAIN_PRESETS.find((entry) => entry.id === selectedPresetId);
+        if (!preset) {
+            enqueueSnackbar({
+                message: "Could not find the selected domain preset.",
+                variant: "error",
+                autoHideDuration: 2500,
+            });
+            return;
+        }
+
+        setIsLoadingPreset(true);
+        try {
+            const response = await fetch(preset.path);
+            if (!response.ok) {
+                throw new Error(`Failed to load the ${preset.label} preset.`);
+            }
+            const parsedData = await response.json();
+            const count = Array.isArray(parsedData) ? parsedData.length : parsedData.annotationTypes?.length || 0;
+            await importAnnotationTypesFromPayload(parsedData, `Loaded the ${preset.label} preset (${count} types).`);
+        } catch (err) {
+            enqueueSnackbar({
+                message: err instanceof Error ? err.message : "Failed to load domain preset.",
+                variant: "error",
+                autoHideDuration: 2500,
+            });
+        } finally {
+            setIsLoadingPreset(false);
+        }
+    };
+
     const handleResolutionComplete = async () => {
         try {
-            const updatedTypes = [...annotationTypes];
+            const resolvedImportedTypes = resolveImportedAnnotationTypes(pendingImport, importResolution);
+            const importedNames = new Set(resolvedImportedTypes.map((type) => type.name.toLowerCase()));
+            const untouchedExistingTypes = annotationTypes.filter((type) => !importedNames.has(type.name.toLowerCase()));
+            const finalTypes = [...untouchedExistingTypes, ...resolvedImportedTypes];
 
-            duplicates.forEach(({ original, imported }) => {
-                const resolution = importResolution[imported.name];
-
-                switch (resolution) {
-                    case "replace":
-                        {
-                            const index = updatedTypes.findIndex((t) => t.id === original.id);
-                            if (index >= 0) {
-                                updatedTypes[index] = imported;
-                            }
-                        }
-                        break;
-
-                    case "skip":
-                        break;
-                }
-            });
-
-            // Add non-duplicate types
-            const duplicateNames = new Set(duplicates.map((d) => d.imported.name.toLowerCase()));
-            const nonDuplicates = pendingImport.filter((type) => !duplicateNames.has(type.name.toLowerCase()));
-
-            const finalTypes = [...updatedTypes, ...nonDuplicates];
             await setDocumentSetting("annotationTypes", finalTypes);
             setAnnotationTypes(finalTypes);
 
@@ -287,6 +405,28 @@ export const ViewAnnotationTypes = ({
             <div className={"mb-2"}>snify Catalogs:</div>
             <div className={"mb-2"}>
                 <Button onClick={() => setShowImportCatalogDialog(true)}>Manage/Import External Catalog</Button>
+            </div>
+
+            <div className={"mb-2"}>Domain Presets:</div>
+            <div className="mb-4 flex flex-col gap-2">
+                <div className="flex min-w-64 flex-col gap-0.5">
+                    <Label htmlFor="woide-domain-preset">Domain-specific WOIDE version</Label>
+                    <SelectComponent
+                        id="woide-domain-preset"
+                        value={selectedPresetId}
+                        onChange={(event) => setSelectedPresetId(event.target.value)}
+                    >
+                        <option value="">Select a preset</option>
+                        {WOIDE_DOMAIN_PRESETS.map((preset) => (
+                            <option key={preset.id} value={preset.id}>
+                                {preset.label}
+                            </option>
+                        ))}
+                    </SelectComponent>
+                </div>
+                <Button className="w-fit" onClick={handleLoadPreset} disabled={!selectedPresetId || isLoadingPreset}>
+                    {isLoadingPreset ? "Loading..." : "Load Preset"}
+                </Button>
             </div>
 
             <div className={"mb-2"}>Annotation Types:</div>

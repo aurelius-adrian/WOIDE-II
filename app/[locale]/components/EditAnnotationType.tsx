@@ -76,7 +76,7 @@ export const EditAnnotationType = ({ annotationType }: { annotationType: Annotat
             }
             if (selectedLayer) {
                 saveLayerSelections(selectedLayer, currentSelections, isSelectAll);
-                }
+            }
 
             const prevAnnotationTypes = ((await getDocumentSetting("annotationTypes")) ?? []) as AnnotationType[];
             const idx = prevAnnotationTypes.findIndex((e) => e.id === tmpId);
